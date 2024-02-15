@@ -1,0 +1,387 @@
+/*
+   ____                                      
+  / ___|___  _ __ ___  _ __ ___   ___  _ __  
+ | |   / _ \| '_ ` _ \| '_ ` _ \ / _ \| '_ \ 
+ | |__| (_) | | | | | | | | | | | (_) | | | |
+  \____\___/|_| |_| |_|_| |_| |_|\___/|_| |_|
+                                             
+*/
+
+@font-face {
+    font-family: "tiki";
+    src: url(../fonts/tiki.otf);
+}
+@font-face {
+    font-family: "vregular";
+    src: url(../fonts/vogueregular.ttf);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    background-color: #80808026;
+    font-family: Poppins, sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+a {
+    cursor: pointer;
+}
+
+a:link {
+    color: #fe9a00;
+}
+
+a:visited {
+    color: #047a68;
+}
+
+a:link, a:visited, a:active {
+    text-decoration:none;
+    cursor: pointer;
+    
+}
+
+.slogan {
+    width: 514px;
+    height: 56px;
+    margin-bottom: 12px;
+}
+
+.submit {
+    width: 330px;
+    padding: 14px 16px;
+    border: 1px solid #808080ad;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: white;
+    background-color: #047a68;
+    cursor: pointer;
+}
+
+.error-container {
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+form {
+    padding: 55px 36px;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    background-color: #fefefe;
+}
+
+form label {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+form label input, textarea {
+    width: 330px;
+    padding: 14px 16px;
+    font-size: 17px;
+    border-radius: 6px;
+    border: 1px solid gray;
+}
+
+form h2 {
+    margin-left: 5px;
+    font-size: 1rem;
+    color: #cb1129;
+}
+
+form h3 {
+    margin-left: 5px;
+    font-size: 1rem;
+    color: #27954b;
+}
+
+hr {
+    width: 330px;
+    margin: 30px 0px;
+    border: 1px solid #808080ad;
+}
+
+
+
+.xmark {
+    color: #cb1129;
+}
+
+.msg-container {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.checkmark {
+    color: #27954b;
+}
+
+
+
+/*
+  _                _       
+ | |    ___   __ _(_)_ __  
+ | |   / _ \ / _` | | '_ \ 
+ | |__| (_) | (_| | | | | |
+ |_____\___/ \__, |_|_| |_|
+             |___/         
+*/
+
+#container {
+    width: 100%;
+    height: 100vh;
+    margin: 0 auto;
+    padding: 25px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+#brand {
+    width: 50%;
+    padding: 25px;
+    display: flex;
+    align-items: center;   
+}
+
+#logo-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+#slogan-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#presentation {
+    margin-left: 10px;
+    font-size: 1.7rem;
+    font-family: vregular, sans-serif;
+}
+
+#form-container {
+    width: 50%; 
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+
+#register {
+    width: 155px;
+    margin-bottom: 0;
+    border: 1px solid #808080ad;
+    border-radius: 6px;
+    background-color: #ffb600;
+    cursor: pointer;
+}
+
+#register a {
+    width: 100%;
+    padding: 14px 16px;
+    color: white;
+    text-align: center;
+}
+
+@media (max-width: 1461px) {
+    #container {
+        flex-direction: column;
+        height: auto;
+    }
+    #brand {
+        flex-direction: column;
+        padding: 0;
+    }
+    #logo-container {
+        justify-content: center;
+    }
+    #slogan {
+        width: 381px;
+    }
+    #form-container {
+        padding: o;
+    }
+}
+
+/*
+  ____            _     _            _____                    
+ |  _ \ ___  __ _(_)___| |_ ___ _ __|  ___|__  _ __ _ __ ___  
+ | |_) / _ \/ _` | / __| __/ _ \ '__| |_ / _ \| '__| '_ ` _ \ 
+ |  _ <  __/ (_| | \__ \ ||  __/ |  |  _| (_) | |  | | | | | |
+ |_| \_\___|\__, |_|___/\__\___|_|  |_|  \___/|_|  |_| |_| |_|
+            |___/                                             
+*/
+
+#rgf-container {
+    width: 100%;
+    height: 100vh;
+}
+
+#rgform {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#rgbrand {
+    margin: 0 auto;
+    padding: 25px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+#login-question {
+    margin-top: 20px;
+    color: black;
+}
+
+/*
+  _   _                      
+ | | | | ___  _ __ ___   ___ 
+ | |_| |/ _ \| '_ ` _ \ / _ \
+ |  _  | (_) | | | | | |  __/
+ |_| |_|\___/|_| |_| |_|\___|
+                             
+*/
+
+header {
+    display: flex;
+    width: 100%;
+    align-items: center;
+}
+
+#home-container {
+    width: 100%;
+    height: 100vh;
+    margin: 0 auto;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+}
+
+h1 {
+    font-family: tiki, sans-serif;
+    font-size: 4rem;
+    background: linear-gradient(90deg, rgba(255,183,0,1) 0%, rgba(255,130,0,1) 50%, rgba(255,65,41,1) 100%);
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+}
+
+#logout-container {
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+#logout {
+    width: 69px;
+    margin-left: 18px;
+    margin-bottom: 0;
+    border: 1px solid #808080ad;
+    border-radius: 6px;
+    background-color: #047a68;
+    cursor: pointer;
+}
+
+#logout a {
+    width: 100%;
+    padding: 8px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+}
+
+#logout-container i {
+    font-size: 1.5rem;
+    color: #ffb600;
+    margin-right: 10px;
+}
+
+
+#user-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px;
+    background: #000000bf;
+    color: white;
+    border-radius: 6px;
+}
+
+#content-wp {
+    width: 100%;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#sections-wp, #create-section-wp {
+    width: 50%;
+    margin: 0 auto;
+    margin-top: 60px;
+}
+
+#sections-wp article {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    border: 2px solid #fe9a00;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+#sections-wp article h2 {
+    color: #047a68;
+}
+
+.pattern {
+    background-image: url(../images/tribal.png);
+    width: 100%;
+    height: 20px;
+    background-position: center;
+}
+
+
+    
