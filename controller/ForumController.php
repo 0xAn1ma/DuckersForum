@@ -36,15 +36,60 @@ class ForumController {
         return $data;
     }
 
+    public function delete_section($section_id) {
+        $data = [];
+        if($this->userController->is_admin($this->userController->username) == false) {
+            $data['status'] = 1;
+            $data['error'] = 'is_not_an_admin';
+            return $data;
+        }
+
+        $r = $this->model->delete_section($section_id);
+        if($r === 'section_id_does_not_exist') {
+            $data['status'] = 1;
+            $data['error'] = 'section_id_does_not_exist';
+            return $data;
+        }
+
+        $data['status'] = 0;
+        $data['error'] = '';
+        return $data;
+    }
+
+    public function edit_section($id, $title, $description) {
+        $data = [];
+        if ($this->userController->is_admin == false) {
+            $data['status'] = 1;
+            $data['msg'] = 'error';
+            $data['error'] = 'is_not_an_admin';
+            return $data;
+        }
+        
+        if (empty($id) || empty($title) || empty($description)) {
+            $data['status'] = 1;
+            $data['msg'] = 'error';
+            $data['error'] = 'empty_data';
+            return $data;
+        }
+
+        $r = $this->model->edit_section($id, $title, $description);
+
+        if ($r === false) {
+            $data['status'] = 1;
+            $data['msg'] = 'error';
+            $data['error'] = 'edit_failed';
+            return $data;
+        }
+
+        $data['status'] = 0;
+        $data['msg'] = 'ok';
+        return $data;
+    }
+
     // Obtener data de todas las secciones
     public function get_sections() {
         return $this->model->get_sections();
-    }
-
-    // Obtener data para 1 seccion
-    public function get_section_data() {
-   
-    }     
+    }   
 
     // Crear secciones
 

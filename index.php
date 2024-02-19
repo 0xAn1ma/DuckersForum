@@ -18,11 +18,7 @@
 
     // Default page
     if(!isset($_GET['action']) && !isset($_GET['view'])) {
-        if($userController->isConnected == true) {
-            header("Location: index.php?view=home");
-            exit();
-        }
-        include 'view/login.php';
+        header("Location: index.php?view=home");
         exit();
     }
 
@@ -71,17 +67,32 @@
             header("Location: " .$data['redirectUrl']);
             exit();
         }
+
+        if($_GET['action'] === "delete_section") {
+            $data = $forumController->delete_section($_GET['section_id']);
+            header('Content-Type: application/json');
+            echo(json_encode($data));
+            exit();
+        }
+
+        if($_GET['action'] === "edit_section") {
+            $rawPostData = file_get_contents("php://input");
+            $requestData = json_decode($rawPostData);
+            $data = $forumController->edit_section($requestData->id, $requestData->title, $requestData->description);
+            //header('Content-Type: application/json');
+            echo(json_encode($data));
+            exit();
+        }
+
+        
     }
-    
+  
     // View Controller
     if (isset($_GET['view'])) {
         if ($_GET['view'] === 'home') {
-            if($userController->isConnected == false) {
-                header("Location: index.php");
-                exit();
-            }
             $sections = $forumController->get_sections();
-            include 'view/home.php';
+            $view = "view/home.php";
+            include 'view/template.php';
             exit();
         }
 
@@ -99,7 +110,8 @@
                 header("Location: index.php");
                 exit();
             }
-            include 'view/login.php';
+            $view = "view/login.php";
+            include 'view/template.php';
             exit();
         }
 
@@ -107,7 +119,5 @@
 
 
     }
-
-  
 
 ?>

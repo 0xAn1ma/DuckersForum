@@ -28,7 +28,7 @@ body {
     margin: 0;
     background-color: #80808026;
     font-family: Poppins, sans-serif;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 400;
 }
 
@@ -50,13 +50,21 @@ a:link, a:visited, a:active {
     
 }
 
+.pattern {
+    background-image: url(../images/tribal.png);
+    width: 100%;
+    height: 20px;
+    background-position: center;
+}
+
+
 .slogan {
     width: 514px;
     height: 56px;
     margin-bottom: 12px;
 }
 
-.submit {
+.submit  {
     width: 330px;
     padding: 14px 16px;
     border: 1px solid #808080ad;
@@ -66,6 +74,7 @@ a:link, a:visited, a:active {
     background-color: #047a68;
     cursor: pointer;
 }
+
 
 .error-container {
     margin-bottom: 0.5rem;
@@ -361,27 +370,77 @@ h1 {
     margin-top: 60px;
 }
 
-#sections-wp article {
+#sections-wp {
+    background-color: white;
+    padding: 30px;
+    border-radius: 20px;
+}
+
+.section-wp {
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    margin-bottom: 15px;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
     border: 2px solid #fe9a00;
     border-radius: 6px;
     padding: 10px;
 }
 
-#sections-wp article h2 {
+.section-wp h2 {
     color: #047a68;
 }
 
-.pattern {
-    background-image: url(../images/tribal.png);
+
+.all-section-wp {
+    display: flex;
     width: 100%;
-    height: 20px;
-    background-position: center;
+}
+
+.ellipsis-wp {
+    margin-top: 9px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    cursor: pointer;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+  
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 150px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+  
+.dropdown-content label {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: flex;
+
+}
+  
+.dropdown-content label:hover {background-color: #f1f1f1}
+  
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.edit .delete {
+    display: flex;
+}
+
+.dropdown-content label p {
+    margin-left: 2px;
+
 }
 
 
-    

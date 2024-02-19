@@ -3,20 +3,16 @@
     class ForumModel {
 
         private $conn;
-
-        public $title;
-        public $description;
         public $user_id;
-
+        
         public function __construct($db) {
             $this->conn = $db;
         }
 
-        function does_section_exist($title) {
-            $query = "SELECT title FROM sections WHERE title=:title";
+        function does_section_exist($section_id) {
+            $query = "SELECT id FROM sections WHERE id=:section_id";
             $stmt = $this->conn->prepare($query);
-            
-            $stmt->bindParam(":title", $title);
+            $stmt->bindParam(":section_id", $section_id);
             $stmt->execute();
 
             // Check if any rows are returned
@@ -33,7 +29,6 @@
                 return "section_name_taken";
             }
             
-            echo $user_id;
             $query = "INSERT INTO sections SET title=:title, description=:description, user_id=:user_id";
             $stmt = $this->conn->prepare($query);
 
@@ -48,6 +43,37 @@
         
         }
 
+        function delete_section($section_id) {
+            if($this->does_section_exist($section_id) == false) {
+                return "section_id_does_not_exist";
+            }
+
+            $query = "DELETE FROM sections WHERE id=:section_id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(":section_id", $section_id);
+
+            if($stmt->execute()) {
+                return true;
+            }
+            return false;
+        }
+
+        function edit_section($id, $title, $description){
+            if($this->does_section_exist($id) == false) {
+                return "section_id_does_not_exist";
+            }
+
+            $query = "UPDATE sections SET title=:title, description=:description WHERE id=:id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(":title", $title);
+            $stmt->bindParam(":description", $description);
+            $stmt->bindParam(":id", $id);
+            if($stmt->execute()) {
+                return true;
+            }
+            return false;
+        }
+
         // Obtener data de todas las secciones
         public function get_sections() {
             $query = "SELECT * FROM sections";
@@ -57,6 +83,15 @@
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
             return [];
+        }
+
+        public function get_section_data($section_id) {
+            $query = "SELECT * FROM sections WHERE id=:section_id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(":section_id", $section_id);
+            $stmt->execute();
+            $section = $stmt->fetchAll(PDO::FETCH_ASSOC)[0];
+            return $section;
         }
 
         public function getData($username, $column) {
