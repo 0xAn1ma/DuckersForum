@@ -34,7 +34,7 @@
             <label><h2 id="rgform-title">Sign up</h2></label>
             <?php
                 // ALERTS
-                if(isset($_GET['error']) && strtolower($_GET['error']) == "not_valid_broh") {
+                if(isset($_GET['error']) && strtolower($_GET['error']) == "empty_data") {
                     echo '<div class="error-container"><i class="xmark fa-solid fa-xmark"></i><h2>Something went wrong</h2></div>';
                 }
                 if(isset($_GET['error']) && strtolower($_GET['error']) == "invalid_email") {

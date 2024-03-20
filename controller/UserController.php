@@ -16,7 +16,7 @@
         private $is_connected = false;
         public $user_id;
         public $username;
-        public $is_admin = false;
+        private $is_admin = false;
         private $total_threads;
         private $total_posts;
         private $registration_date;
@@ -62,6 +62,7 @@
         public function is_admin($username) {
             return $this->model->is_admin($username);
         }
+
         // Comprueba si el usuario está registrado
         public function is_registered($username) {
             return $this->model->is_registered($username);
@@ -77,18 +78,13 @@
             $loginData = [];
 
             // Incorrect login
-            $loginResult = $this->model->login($username, $password);
-            if($loginResult['success'] === false) {
-                $loginData['status'] = 1;
-                $loginData['redirectUrl'] = "index.php?view=login&error=incorrectpass";
-                return $loginData;
+            if(!$this->model->login($username, $password)) {
+                return DataController::generateData(1, "incorrectpass", "index.php?view=login&error=incorrectpass");
             }
 
             // Correct login
-            $loginData['status'] = 0;
-            $loginData['redirectUrl'] = "index.php?view=home";
             $_SESSION['username'] = $username;
-            return $loginData;
+            return DataController::generateData(0, "ok", "index.php");
         }
 
         public function logout() {
@@ -173,6 +169,10 @@
             return $this->is_connected;
         }
 
+        public function get_is_admin() {
+            return $this->is_admin;
+        }
+
         public function get_user_id() {
             return $this->user_id;
         }
@@ -181,20 +181,32 @@
             return $this->registration_date;
         }
 
-        public function count_threads($user_id) {
-            return $this->model->count_threads($user_id);
+        public function get_total_threads() {
+            return $this->total_threads;
         }
 
-        public function get_my_threads($user_id) {
-            return $this->model->get_my_threads($user_id);
+        public function get_total_posts() {
+            return $this->total_posts;
+        }
+
+        public function get_my_threads() {
+            return DataController::generateData(0, "ok", "", [
+                "threads" => $this->model->get_my_threads($this->get_user_id())
+            ]);
         }
 
         public function count_posts($user_id) {
             return $this->model->count_posts($user_id);
         }
-        
-        public function get_my_posts($user_id) {
-            return $this->model->get_my_posts($user_id);
+
+        public function count_threads($user_id) {
+            return $this->model->count_threads($user_id);
+        }
+
+        public function get_my_posts() {
+            return DataController::generateData(0, "ok", "", [
+                "posts" => $this->model->get_my_posts($this->get_user_id())
+            ]);
         }
     }
 

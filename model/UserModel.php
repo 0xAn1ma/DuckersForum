@@ -9,7 +9,6 @@
     class UserModel {
 
         private $conn;
-
         public $user_id;
         public $username;
         public $email;
@@ -83,7 +82,7 @@
 
         public function login($username, $password) {
 
-            if($this->is_registered($username) == false) {
+            if(!$this->is_registered($username)) {
                 return false;
             }
 
@@ -97,11 +96,9 @@
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
                 $data = [];
                 if (!password_verify($password, $row['password'])) {
-                    $data['success'] = false;
-                    return $data;
-                }
-                $data['success'] = true;
-                return $data;
+                    return false;
+                }                
+                return true;
             }
             
         }

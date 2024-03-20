@@ -23,7 +23,7 @@
 <div id="posts-wp">
 <?php
     // POR CADA POST
-    foreach($posts as $post) {
+    foreach($data['posts'] as $post) {
     ?>
     <section class="complete-post">
     <?php 

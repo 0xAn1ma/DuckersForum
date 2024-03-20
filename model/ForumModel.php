@@ -93,7 +93,7 @@
         }
 
         // Obtiene array data con los threads de una sección
-        public function get_threads_section($section_id) {
+        public function get_section_threads($section_id) {
             $stmt = $this->conn->prepare("SELECT * FROM threads WHERE section_id=:section_id ORDER BY creation_date DESC");
             $stmt->bindParam(":section_id", $section_id);
             $stmt->execute();
@@ -224,7 +224,7 @@
         }
 
         // Obtener los replies o posts de un thread
-        public function get_posts_thread($thread_id) {
+        public function get_thread_posts($thread_id) {
             $stmt = $this->conn->prepare("SELECT * FROM posts WHERE thread_id=:thread_id");
             $stmt->bindParam(":thread_id", $thread_id);
             $stmt->execute();

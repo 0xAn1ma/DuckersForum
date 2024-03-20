@@ -105,7 +105,7 @@ class ForumController {
     // Obtiene data de todas las secciones
     public function get_sections() {
         // Manda la orden al modelo para obtener un array data con las secciones
-        return $this->model->get_sections();
+        return DataController::generateData(0, "ok", "", ["sections" => $this->model->get_sections()]);
     }
 
     // Obtiene data sobre una sección
@@ -123,9 +123,15 @@ class ForumController {
     }
 
     // Obtiene data de todos los threads dentro de una sección
-    public function get_threads_section($section_id) {
+    public function get_section_threads($section_id) {
         // Manda la orden al modelo para obtener el data de los threads dentro de una seccion
-        return $this->model->get_threads_section($section_id);
+        if (!$this->model->does_section_exist($section_id)) {
+            return DataController::generateData(1, "section_not_exist", "index.php");
+        }
+        return DataController::generateData(0, "ok", "",[
+            "section" => $this->model->get_section_data($section_id), 
+            "threads" => $this->model->get_section_threads($section_id)
+        ]);
     }
 
     // Obtiene el numero de threads dentro de una sección
@@ -226,24 +232,33 @@ class ForumController {
     }
 
     // Obtner la información de un thread
-    public function get_thread ($id) {
-        if(empty($id)) {
-            return DataController::generateData(1, "empty_thread_id", "index.php");
+    public function get_thread ($section_id, $thread_id) {
+        if(empty($thread_id) || empty($section_id)) {
+            return DataController::generateData(1, "empty_thread_id", "");
+        }
+
+        $sectionResponse = $this->get_section_data($section_id);
+        if ($sectionResponse === "section_not_exist") {
+            return DataController::generateData(1, $sectionResponse, "");
         }
 
         // Manda la orden al modelo para obtener el data de un thread
-        $response = $this->model->get_thread($id);
-
-        // Si la respuesta es que el thread no existe
-        if($response === 'thread_not_found' ) {
-            return DataController::generateData(1, $response, "index.php");
+        $threadResponse = $this->model->get_thread($thread_id);
+        if($threadResponse === 'thread_not_found' ) {
+            return DataController::generateData(1, $threadResponse, "");
         }
-        return $response;
+        $postsResponse = $this->get_thread_posts($thread_id);
+
+        return DataController::generateData(0, "ok", "", [
+            "section" => $sectionResponse,
+            "thread" => $threadResponse,
+            "posts" => $postsResponse
+        ]);
     }
 
     // Obtener la información de todos los posts dentro de un thread
-    public function get_posts_thread($thread_id) {
-        return $this->model->get_posts_thread($thread_id);
+    public function get_thread_posts($thread_id) {
+        return $this->model->get_thread_posts($thread_id);
     }
 
     // Obtener el número de posts o replies que contiene un thread

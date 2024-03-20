@@ -9,6 +9,7 @@
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
+    $debug = false;
 
     //  ____                            _                 _           
     // |  _ \  ___ _ __   ___ _ __   __| | ___ _ __   ___(_) ___  ___ 
@@ -151,19 +152,18 @@
     //  \ \ / /| |/ _ \ \ /\ / / | |   / _ \| '_ \| __| '__/ _ \| | |/ _ \ '__|
     //   \ V / | |  __/\ V  V /  | |__| (_) | | | | |_| | | (_) | | |  __/ |   
     //    \_/  |_|\___| \_/\_/    \____\___/|_| |_|\__|_|  \___/|_|_|\___|_|   
-                                                                            
 
     if (isset($_GET['view'])) {
         // HOME
         if ($_GET['view'] === 'home') {
-            $sections = $forumController->get_sections();
+            $data = $forumController->get_sections()['data'];
             $view = "view/home.php";
         }
 
         // REGISTER
         if ($_GET['view'] === 'register') {
             $userController->requireNotLoggedIn();
-            $view = 'view/registerform.php';
+            $view = 'view/register.php';
         }
 
         // LOGIN
@@ -174,73 +174,42 @@
 
         // THREADS
         if ($_GET['view'] === 'threads') {
-            $section = $forumController->get_section_data($_GET['section']);
-            if(isset($section['status']) && $section['status'] === 1) {
+            $response = $forumController->get_section_threads($_GET['section']);
+            if($response['status'] === 1) {
                 $forumController->redirectToHome();
             }
-            $threads = $forumController->get_threads_section($_GET['section']);
+            $data = $response['data'];
             $view = "view/threads.php";
         }
 
         // POSTS
         if ($_GET['view'] === 'posts') {
-            $thread = $forumController->get_thread($_GET['thread']);
-            if(isset($thread['status']) && $thread['status'] === 1) {
-                header('Location: '.$thread['redirectUrl']);
-                exit();
+            $response = $forumController->get_thread($_GET['section'], $_GET['thread']);
+            if($response['status'] === 1) {
+                $forumController->redirectToHome();
             }
-            $sections = $forumController->get_sections();
-            $section = $sections[0];
-            $posts = $forumController->get_posts_thread($_GET['thread']);
+            $data = $response['data'];
             $view = "view/posts.php";
-            include 'view/template.php';
-            exit();
         }
 
         // PROFILE
         if($_GET['view'] === 'profile') {
-            if(!$userController->get_is_connected()) {
-                header("Location: index.php");
-                exit();
-            }
-            $user_id = $userController->get_user_id();
-            $user_threads = $userController->count_threads($user_id);
-            $user_posts = $userController->count_posts($user_id);
+            $userController->loginRequired();
             $view = "view/profile.php";
-            include 'view/template.php';
-            exit();
         }
 
         // MY THREADS
         if($_GET['view'] === 'mythreads') {
-            if(!$userController->get_is_connected()) {
-                header("Location: index.php");
-                exit();
-            }
-            $sections = $forumController->get_sections();
-            $section = $sections[0];
-            $user_id = $userController->get_user_id();
-            $threads = $userController->get_my_threads($user_id);
-            $thread = $threads[0];
+            $userController->loginRequired();
+            $data = $userController->get_my_threads()['data'];
             $view = "view/mythreads.php";
-            include 'view/template.php';
-            exit();
         }
 
         // MY POSTS
         if($_GET['view'] === 'myposts') {
-            if(!$userController->get_is_connected()) {
-                header("Location: index.php");
-                exit();
-            }
-            $user_id = $userController->get_user_id();
-            $posts = $userController->get_my_posts($user_id);
-            $post = $posts[0];
-            // var_dump($post);
-            // exit();
+            $userController->loginRequired();
+            $data = $userController->get_my_posts()['data'];
             $view = "view/myposts.php";
-            include 'view/template.php';
-            exit();
         }
 
         include 'view/template.php';

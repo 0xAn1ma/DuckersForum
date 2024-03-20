@@ -25,7 +25,6 @@
         
         // Comprobar que se ha escrito bien la nueva contraseña
         if(newPass !== confirmPass) {
-            
             newPassWp.style.border = '1px solid red'
             confirmPassWp.style.border = '1px solid red'
             document.querySelector('.current-password').value = ""
@@ -89,11 +88,11 @@
     <article class="interactions-wp">
         <a href="index.php?view=mythreads"><div class="threads-profile-wp">
             <p>My threads</p>
-            <p><?=$user_threads?></p>
+            <p><?=$userController->get_total_threads()?></p>
         </div></a>
        <a href="index.php?view=myposts"><div class="replies-profile-wp">
             <p>My replies</p>
-            <p><?=$user_posts?></p>
+            <p><?=$userController->get_total_posts()?></p>
         </div></a>
     </article>
     <hr>

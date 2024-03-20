@@ -128,7 +128,7 @@ tinymce.init({
                 <i class="fa-solid fa-angle-right"></i>
             </span>
             <span>
-                <strong><?=$section['title']?></strong>
+                <strong><?=$data['section']['title']?></strong>
             </span>
         </span>
     </ul>
@@ -136,12 +136,12 @@ tinymce.init({
 <div id="threads-wp">
     <?php
     // POR CADA THREAD
-    foreach($threads as $thread) {
+    foreach($data['threads'] as $thread) {
     ?>  
     <div class="thread-wp thread_<?=$thread['id']?>">
         <article class="thread-content-wp">
             <div>
-                <a href="index.php?view=posts&section=<?=$_GET['section']?>&thread=<?=$thread['id']?>"><h3><?=$thread['title']?></h3></a>
+                <a href="index.php?view=posts&section=<?=$data['section']['id']?>&thread=<?=$thread['id']?>"><h3><?=$thread['title']?></h3></a>
                 <div class="thread-info">
                     <p><?=$thread['creation_date']?> | by <?=$forumController->get_username_by_user_id($thread['user_id'])?></p>
                 </div>

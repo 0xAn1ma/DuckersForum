@@ -1,6 +1,5 @@
 <?php
     if (INIT != "1314") { exit(1); }
-
     //  _   _  ___  __  __ _____  __     _____ _______        __
     // | | | |/ _ \|  \/  | ____| \ \   / /_ _| ____\ \      / /
     // | |_| | | | | |\/| |  _|    \ \ / / | ||  _|  \ \ /\ / / 
@@ -218,11 +217,11 @@
 <div id="sections-wp">
     <?php
     // SI EXISTE ALGUNA SECCIÓN
-    if (count($sections) === 0) {
+    if (count($data['sections']) === 0) {
         echo "<h2>No sections. Please add.</h2>";
     }
     // POR CADA SECCION 
-    foreach($sections as $section) {
+    foreach($data['sections'] as $section) {
     ?>  <div class="all-section-wp section_<?=$section['id']?>">
             <article class="section-wp">
                 <div class="section_content_<?=$section['id']?>">
@@ -236,7 +235,7 @@
             </article>
             <?php 
             // SI EL USUARIO ES ADMINISTRADOR
-            if($userController->is_admin === true) {
+            if($userController->get_is_admin()) {
             ?>
             <div class="dropdown-wp">
                 <div class="dropdown ellipsis-wp">
@@ -273,7 +272,7 @@
     }
 ?>
 <!-- SI EL USUARIO ES ADMINISTRADOR -->
-<?php if($userController->is_admin === true) {
+<?php if($userController->get_is_admin()) {
 ?>
 <div id="create-section-wp">
     <article class="create-section">

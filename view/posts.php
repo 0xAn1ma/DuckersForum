@@ -1,6 +1,8 @@
 <?php
     if (INIT != "1314") { exit(1); }
-    
+    if ($debug) {
+        echo '<pre>' , var_dump($data) , '</pre>';
+    }
     //  ____   ___  ____ _____ ____   __     _____ _______        __
     // |  _ \ / _ \/ ___|_   _/ ___|  \ \   / /_ _| ____\ \      / /
     // | |_) | | | \___ \ | | \___ \   \ \ / / | ||  _|  \ \ /\ / / 
@@ -156,7 +158,7 @@
         const msgValue = tinymce.activeEditor.getContent('#editor')
         // Llamar al servidor para crear el post
         try {
-            const response = await fetch("index.php?action=create_post&section=<?=$thread['section_id']?>&thread=<?=$thread_id?>", {
+            const response = await fetch("index.php?action=create_post&section=<?=$data['thread']['section_id']?>&thread=<?=$data['thread']['id']?>", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -325,39 +327,39 @@
                 <i class="fa-solid fa-angle-right"></i>
             </span>
             <span>
-                <a href="index.php?view=threads&section=<?=$section['id']?>"><?=$section['title']?></a>
+                <a href="index.php?view=threads&section=<?=$data['section']['id']?>"><?=$data['section']['title']?></a>
             </span>
             <span>
                 <i class="fa-solid fa-angle-right"></i>
             </span>
             <span>
-                <strong><?=$thread['title']?></strong>
+                <strong><?=$data['thread']['title']?></strong>
             </span>
         </span>
     </ul>
 </nav>  
 <div id="posts-wp">
     <!-- THREAD -->
-    <section class="complete-thread thread_<?=$thread['id']?> thread_content_<?=$thread['id']?>">
+    <section class="complete-thread thread_<?=$data['thread']['id']?> thread_content_<?=$data['thread']['id']?>">
         <div class="thread-title-wp">
             <section class="reference-wp">
                 <p class="reference">#1</p>
-                <h3 class="thread_title_<?=$thread['id']?>"><?=$thread['title']?></h3>
+                <h3 class="thread_title_<?=$data['thread']['id']?>"><?=$data['thread']['title']?></h3>
             </section>
             <?php
             // SI EL USUARIO ES EL CREADOR DEL THREAD
-            if($userController->get_is_connected() && $thread['user_id'] == $userController->get_user_id()) {
+            if($userController->get_is_connected() && $data['thread']['user_id'] == $userController->get_user_id()) {
             ?>
             <div class="dropdown-wp">
                 <div class="dropdown ellipsis-wp">
                     <i class="fa-solid fa-ellipsis-vertical c-black"></i>
                     <div class="menu dropdown-content thread-menu">
                     <ul class="nav-list">
-                        <li onclick ="toggle_edit_thread(<?=$thread_id?>)">
+                        <li onclick ="toggle_edit_thread(<?=$data['thread']['id']?>)">
                             <i class="fa-regular fa-pen-to-square"></i>
                             <span>Edit</span> 
                         </li>
-                        <li onclick ="delete_thread(<?=$thread['id']?>)">
+                        <li onclick ="delete_thread(<?=$data['thread']['id']?>)">
                             <i class="fa-solid fa-trash"></i>
                             <span>Delete</span> 
                         </li>
@@ -372,18 +374,18 @@
         <div class="info-thread-wp">
             <!-- THREAD USER PROFILE -->
             <article class="user-profile">
-                <p class="username"><?=$forumController->get_username_by_user_id($thread['user_id'])?></p>
+                <p class="username"><?=$forumController->get_username_by_user_id($data['thread']['user_id'])?></p>
                 <img src="images/default-user" alt="avatar" width="130" height="130">
                 <hr>
                 <div class="int-info">
-                    <p>Post: <?=$userController->count_posts($thread['user_id']);?></p>
-                    <p>Threads: <?=$userController->count_threads($thread['user_id']);?></p>
-                    <p>Joined: <?=$forumController->get_joined_date_by_user_id($thread['user_id'])?><p>
+                    <p>Post: <?=$userController->count_posts($data['thread']['user_id']);?></p>
+                    <p>Threads: <?=$userController->count_threads($data['thread']['user_id']);?></p>
+                    <p>Joined: <?=$forumController->get_joined_date_by_user_id($data['thread']['user_id'])?><p>
                 </div>
             </article>
             <article class="thread-msg">
-                <p><?=$thread['creation_date']?></p>
-                <div class="thread_msg_<?=$thread['id']?> post-msg-plus"><?=$thread['msg']?></div>
+                <p><?=$data['thread']['creation_date']?></p>
+                <div class="thread_msg_<?=$data['thread']['id']?> post-msg-plus"><?=$data['thread']['msg']?></div>
             </article>
         </div>
     </section>
@@ -392,7 +394,7 @@
     <?php
     // POR CADA POST
     $postId = 2;
-    foreach($posts as $post) {
+    foreach($data['posts'] as $post) {
     ?>
     <section class="complete-post">
         <div class="post-title-wp">
