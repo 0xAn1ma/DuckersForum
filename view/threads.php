@@ -76,6 +76,7 @@ tinymce.init({
     'removeformat | emoticons',
     content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
     max_chars: 2000,
+    newline_behavior: 'linebreak',
     setup: function(editor) {
 
         // Evento para manejar cambios de teclado y pegado
@@ -153,14 +154,18 @@ tinymce.init({
         // SI EL USUARIO ES EL CREADOR DEL THREAD
         if($userController->get_is_connected() && $thread['user_id'] == $userController->get_user_id()) {
         ?>
-        <div class="dropdown ellipsis-wp">
-            <i class="fa-solid fa-ellipsis-vertical"></i> 
-            <div class="dropdown-content">
-                <label onclick ="delete_thread(<?=$thread['id']?>)">
-                    <i class="fa-solid fa-trash"></i>
-                    <p>Delete</p>
-                </label>
-            </div>
+        <div class="dropdown-wp">
+            <div class="dropdown ellipsis-wp">
+                <i class="fa-solid fa-ellipsis-vertical c-black"></i>
+                <div class="menu dropdown-content section-menu">
+                <ul class="nav-list">
+                    <li onclick ="delete_thread(<?=$thread['id']?>)">
+                        <i class="fa-solid fa-trash"></i>
+                        <span>Delete</span> 
+                    </li>
+                </ul>
+                </div>
+            </div> 
         </div>
         <?php
         }

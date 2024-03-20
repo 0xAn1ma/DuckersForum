@@ -1,23 +1,36 @@
 <script type="text/javascript">
    
    async function editPassword() {
-       // Confirmar antes de editar
-       if (!confirm('Are you sure you want to edit password?')) {
-            return
-        }
-
         const currentPass = document.querySelector('.current-password').value
         const newPass = document.querySelector('.new-password').value
         const confirmPass = document.querySelector('.confirm-new-password').value
+        const currentPassWp = document.querySelector('.current-password')
+        const newPassWp = document.querySelector('.new-password')
+        const confirmPassWp = document.querySelector('.confirm-new-password')
+
 
         // Comprobar que ningún campo está vacio
-        if( !currentPass || !newPass || !confirmPass) {
-            alert('Empty data')
-            return
+        if(!currentPass || !newPass || !confirmPass) {
+            if(!currentPass) {
+                currentPassWp.style.border = '1px solid red'
+            }
+            if(!newPass) {
+                newPassWp.style.border = '1px solid red'
+            }
+            if(!confirmPass) {
+                confirmPassWp.style.border = '1px solid red'
+            }
+            return false
         }
+        
         // Comprobar que se ha escrito bien la nueva contraseña
         if(newPass !== confirmPass) {
-            alert('something has gone wrong')
+            
+            newPassWp.style.border = '1px solid red'
+            confirmPassWp.style.border = '1px solid red'
+            document.querySelector('.current-password').value = ""
+            document.querySelector('.new-password').value = ""
+            document.querySelector('.confirm-new-password').value = ""
             return
         }
         

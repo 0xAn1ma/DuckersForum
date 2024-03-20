@@ -135,7 +135,7 @@ class ForumController {
         // Manda la orden al modelo para obtener el data de las secciones
         return $this->model->get_sections();
     }
-
+    
     public function get_section_data($section_id) {
         if(empty($section_id) || !is_numeric($section_id)) {
             $data['status'] = 1;

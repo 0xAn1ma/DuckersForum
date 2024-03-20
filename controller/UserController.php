@@ -64,9 +64,9 @@
 
             // Incorrect login
             $loginResult = $this->model->login($username, $password);
-            if($loginResult['success'] == false) {
+            if($loginResult['success'] === false) {
                 $loginData['status'] = 1;
-                $loginData['redirectUrl'] = "index.php?error=incorrectpass";
+                $loginData['redirectUrl'] = "index.php?view=login&error=incorrectpass";
                 return $loginData;
             }
 
@@ -104,7 +104,7 @@
             // $this->sendRegistrationMail($username)
 
             $data['status'] = 0;
-            $data['redirectUrl'] = 'index.php?msg=register_success';
+            $data['redirectUrl'] = 'index.php?view=login&msg=register_success';
             return $data;
         }
 

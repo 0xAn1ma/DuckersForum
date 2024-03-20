@@ -12,9 +12,9 @@
         <link rel="stylesheet" href="styles/styles.css" type="text/css">
         <script src="https://kit.fontawesome.com/cdb3baf29a.js" crossorigin="anonymous"></script>
         <script src="js/tinymce/tinymce.min.js" type="text/javascript"></script>
-        <script type="text/javascript">
-            function menuToggle() {
-                const toggleMenu = document.querySelector(".menu");
+        <script type="text/javascript">  
+            function menuToggle(selector) {
+                const toggleMenu = document.querySelector(`#${selector}`);
                 toggleMenu.classList.toggle("active");
             }
         </script>
@@ -37,12 +37,12 @@
                 else {
                 ?>  
                     <nav id="navbar" class="nav">
-                        <div class="profile" id="user-container" onclick="menuToggle()">
+                        <div class="profile" id="user-container" onclick="menuToggle('profile-menu')">
                             <img src="images/default-user" alt="avatar" width="60" height="60">
                             <p><?=$_SESSION['username']?></p>
                         </div>
-                        <div class="menu">
-                            <ul id="nav-list">
+                        <div id="profile-menu" class="menu">
+                            <ul class="nav-list">
                                 <li>
                                     <i class="fa-solid fa-user"></i>
                                     <a href="index.php?view=profile">My profile</a>

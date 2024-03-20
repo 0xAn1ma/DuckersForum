@@ -40,7 +40,7 @@
         <?php
             // ALERT: SI LA CONTRASEÑA ES INCORRECTA
             if(isset($_GET['error']) && strtolower($_GET['error']) == "incorrectpass") {
-                echo '<div class="error-container"><i class="xmark fa-solid fa-xmark"></i><h2>Incorrect password or username</h2></div>';
+                echo '<div class="error-container"><i class="xmark fa-solid fa-xmark"></i><h2> Incorrect password or username</h2></div>';
             }
         ?>
         <label id="firstlbl"><input type="text" name="username" placeholder="Username"></label>

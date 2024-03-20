@@ -45,9 +45,11 @@
         } 
     }
 
+    let editToggled = false
+
     async function edit_section(sectionId) {
        // Confirmar antes de editar
-       if (!confirm('Are you sure you want to edit this section?')) {
+        if (!confirm('Are you sure you want to edit this section?')) {
             return
         }
 
@@ -76,7 +78,12 @@
         // Volver a mostrar los elementos HTML como antes (h2, p)
     }
 
-    function toggle_edit_section(sectionId) {        
+    function toggle_edit_section(sectionId) {   
+        if(editToggled === true){
+            return
+        }
+        editToggled = true; 
+
         const title = document.querySelector(`.section_title_${sectionId}`)
         const description = document.querySelector(`.section_desc_${sectionId}`)
         const content = document.querySelector(`.section_content_${sectionId}`)
@@ -191,7 +198,6 @@
     });
 
 </script>
-
     <!-- 
      ____  _                   _                  
     / ___|| |_ _ __ _   _  ___| |_ _   _ _ __ ___ 
@@ -232,18 +238,22 @@
             // SI EL USUARIO ES ADMINISTRADOR
             if($userController->is_admin === true) {
             ?>
-            <div class="dropdown ellipsis-wp">
-                <i class="fa-solid fa-ellipsis-vertical c-black"></i> 
-                <div class="dropdown-content">
-                    <label onclick ="toggle_edit_section(<?=$section['id']?>)">
-                        <i class="fa-regular fa-pen-to-square"></i>
-                        <p>Edit</p>
-                    </label>
-                    <label onclick ="delete_section(<?=$section['id']?>)">
-                        <i class="fa-solid fa-trash"></i>
-                        <p>Delete</p>
-                    </label>
-                </div>
+            <div class="dropdown-wp">
+                <div class="dropdown ellipsis-wp">
+                    <i class="fa-solid fa-ellipsis-vertical c-black"></i>
+                    <div class="menu dropdown-content section-menu">
+                    <ul class="nav-list">
+                        <li onclick ="toggle_edit_section(<?=$section['id']?>)">
+                            <i class="fa-regular fa-pen-to-square"></i>
+                            <span>Edit</span> 
+                        </li>
+                        <li onclick ="delete_section(<?=$section['id']?>)">
+                            <i class="fa-solid fa-trash"></i>
+                            <span>Delete</span> 
+                        </li>
+                    </ul>
+                    </div>
+                </div> 
             </div>
             <?php
             }

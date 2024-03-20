@@ -158,6 +158,23 @@ nav a:link, nav a:visited {color: var(--main-nav-grey);}
     position: relative;
     display: inline-block;
 }
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+.dropdown:hover .section-menu {
+    visibility: unset;
+    opacity: unset;
+    top: unset;
+    left: 1px;
+}
+
+.dropdown:hover .post-menu, .dropdown:hover .thread-menu {
+    visibility: unset;
+    opacity: unset;
+    top: 28px;
+    left: -23px;
+}
+
 .dropdown-content {
     display: none;
     position: absolute;
@@ -174,7 +191,6 @@ nav a:link, nav a:visited {color: var(--main-nav-grey);}
 
 }
 .dropdown-content label:hover {background-color: #f1f1f1}
-.dropdown:hover .dropdown-content {display: block;}
 .edit .delete {display: flex;}
 .dropdown-content label p {margin-left: 2px;}
 
@@ -207,16 +223,6 @@ form label input, textarea {
 textarea {
     resize: none;
 }
-
-form h2 {
-    color: #31bd9c;
-}
-
-form h3 {
-    color: var(--main-white);
-    font-size: 1.3em; 
-}
-
 
 .create-post, .create-thread, .create-section {
     display: flex;
@@ -333,11 +339,20 @@ input[type=submit], .register-link {
 }
 
 /* NOTIFICATIONS */
-.error-container {
+.error-container, .msg-container {
     margin-bottom: 0.5rem;
     display: flex;
     justify-content: center;
-    align-items: center;
+}
+.error-container h2 {
+    color: #cb1129;
+    font-size: 1em;
+    margin-left: 5px;
+}
+.msg-container h3 {
+    color: var(--main-turquoise);
+    font-size: 1em;
+    margin-left: 5px;
 }
 .xmark {
     color: #cb1129;
@@ -347,12 +362,6 @@ input[type=submit], .register-link {
 }
 .c-black {
     color: var(--main-black);
-}
-.msg-container {
-    margin-top: 0.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 /* SECCION QUE ENVUELVE TODO EL CONTENIDO DESPUES DEL HEADER  */
@@ -493,6 +502,10 @@ input[type=submit], .register-link {
     width: 100%;
 }
 
+#rgform-title {
+    color: #31bd9c;
+}
+
 #login-question {
     margin-top: 20px;
     color: var(--main-black);
@@ -575,10 +588,32 @@ input[type=submit], .register-link {
     align-items: center;
 }
 
+.reference-wp {
+    display: flex;
+}
+
+.reference-wp h3 {
+    font-size: 1.3em;
+}
+
+.reference {
+    margin-right: 5px;
+    font-size: 1.2em;
+
+}
+
+.thread-content-wp .reference {
+    color: var(--main-blue);
+}
+
+.thread-title-wp .reference {
+    color: var(--main-ivory);
+}
+
 .thread-wp h3 {
     color: var(--main-grey);
     margin-bottom: 5px;
-    font-size: 1.3em;
+    
 }
 
 #create-thread-wp {
@@ -594,8 +629,6 @@ input[type=submit], .register-link {
     padding: 30px;
     border-radius: 20px;
 }
-
-
 
 .thread-info p {
     font-size: 0.9rem;
@@ -643,7 +676,7 @@ input[type=submit], .register-link {
 .post-title-wp {
     background-color: var(--main-light-orange);
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     min-height: 60px;
 }
 
@@ -742,9 +775,6 @@ input[type=submit], .register-link {
 
 
 
-
-
-
 .profile {
     position: relative;
     width: 60px;
@@ -762,7 +792,6 @@ input[type=submit], .register-link {
     height: 100%;
     object-fit: cover;
 }
-
 
 .menu {
     position: absolute;
@@ -787,11 +816,17 @@ input[type=submit], .register-link {
     content: "";
     position: absolute;
     top: -5px;
-    right: 28px;
+    /* right: 28px; */
     width: 20px;
     height: 20px;
     background: var(--main-ivory);
     transform: rotate(45deg);
+}
+.nav .menu::before {
+    right: 28px;
+}
+.dropdown .menu::before {
+    right: 115px;
 }
 
 .menu ul li {
@@ -809,11 +844,11 @@ input[type=submit], .register-link {
     margin-left: 5px;
 }
 
-.menu ul li:hover a {
+.menu ul li:hover a, .menu ul li:hover span {
     color: var(--main-turquoise);
 }
 
-#nav-list {
+.nav-list {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -892,7 +927,7 @@ input[type=submit], .register-link {
     margin-right: 10px;
 }
 
-.edit-password-wp label input{
+.current-password, .new-password, .confirm-new-password {
     width: 100%;
     padding: 14px;
     font-size: 1rem;

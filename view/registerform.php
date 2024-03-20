@@ -31,7 +31,7 @@
     </article>
     <article id="rgform">
         <form action="index.php?action=register" method="post">
-            <label><h2>Sign up</h2></label>
+            <label><h2 id="rgform-title">Sign up</h2></label>
             <?php
                 // ALERTS
                 if(isset($_GET['error']) && strtolower($_GET['error']) == "not_valid_broh") {

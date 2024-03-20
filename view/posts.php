@@ -15,6 +15,8 @@
     //  |  _|| |_| | | | | (__| |_| | (_) | | | \__ \
     //  |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
 
+    let editToggled = false
+
     // THREADS
     async function edit_thread(threadId) {
        // Confirmar antes de editar
@@ -54,6 +56,10 @@
     }
 
     function toggle_edit_thread(threadId) {
+        if(editToggled === true){
+            return
+        }
+        editToggled = true; 
         const title = document.querySelector(`.thread_title_${threadId}`)     
         const msg = document.querySelector(`.thread_msg_${threadId}`)
         const content = document.querySelector(`.thread_content_${threadId}`)
@@ -95,6 +101,7 @@
             'alignright alignjustify | bullist numlist outdent indent | ' +
             'removeformat | emoticons',
             content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+            newline_behavior: 'linebreak',
             max_chars: 2000,
             setup: function(editor) {
 
@@ -196,7 +203,11 @@
         }
     }
 
-    function toggle_edit_post(postId) {   
+    function toggle_edit_post(postId) {  
+        if(editToggled === true){
+            return
+        }
+        editToggled = true;  
         const msg = document.querySelector(`.post_msg_${postId}`)
         const content = document.querySelector(`.post_content_${postId}`)
 
@@ -228,7 +239,9 @@
             'bold italic backcolor | alignleft aligncenter ' +
             'alignright alignjustify | bullist numlist outdent indent | ' +
             'removeformat | emoticons',
-            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+            max_chars: 2000,
+            newline_behavior: 'linebreak'
         });
     }
 
@@ -259,6 +272,7 @@
         'removeformat | emoticons',
         content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
         max_chars: 2000,
+        newline_behavior: 'linebreak',
         setup: function(editor) {
 
             // Evento para manejar cambios de teclado y pegado
@@ -326,23 +340,30 @@
     <!-- THREAD -->
     <section class="complete-thread thread_<?=$thread['id']?> thread_content_<?=$thread['id']?>">
         <div class="thread-title-wp">
-            <h3 class="thread_title_<?=$thread['id']?>"><?=$thread['title']?></h3>
+            <section class="reference-wp">
+                <p class="reference">#1</p>
+                <h3 class="thread_title_<?=$thread['id']?>"><?=$thread['title']?></h3>
+            </section>
             <?php
             // SI EL USUARIO ES EL CREADOR DEL THREAD
             if($userController->get_is_connected() && $thread['user_id'] == $userController->get_user_id()) {
             ?>
-            <div class="dropdown ellipsis-wp">
-                <i class="fa-solid fa-ellipsis-vertical"></i> 
-                <div class="dropdown-content">
-                    <label onclick ="toggle_edit_thread(<?=$thread_id?>)">
-                        <i class="fa-regular fa-pen-to-square"></i>
-                        <p>Edit</p>
-                    </label>
-                    <label onclick ="delete_thread(<?=$thread['id']?>)">
-                        <i class="fa-solid fa-trash"></i>
-                        <p>Delete</p>
-                    </label>
-                </div>
+            <div class="dropdown-wp">
+                <div class="dropdown ellipsis-wp">
+                    <i class="fa-solid fa-ellipsis-vertical c-black"></i>
+                    <div class="menu dropdown-content thread-menu">
+                    <ul class="nav-list">
+                        <li onclick ="toggle_edit_thread(<?=$thread_id?>)">
+                            <i class="fa-regular fa-pen-to-square"></i>
+                            <span>Edit</span> 
+                        </li>
+                        <li onclick ="delete_thread(<?=$thread['id']?>)">
+                            <i class="fa-solid fa-trash"></i>
+                            <span>Delete</span> 
+                        </li>
+                    </ul>
+                    </div>
+                </div> 
             </div>
             <?php
             }
@@ -370,26 +391,34 @@
     <!-- POST -->
     <?php
     // POR CADA POST
+    $postId = 2;
     foreach($posts as $post) {
     ?>
     <section class="complete-post">
         <div class="post-title-wp">
+            <section  class="reference-wp">
+                <p class="reference">#<?=$postId?></p>
+            </section>
             <?php 
             // SI EL USUARIO ES EL CREADOR DEL POST
             if($userController->get_is_connected() && $post['user_id'] == $userController->get_user_id()) {
             ?>
-            <div class="dropdown ellipsis-wp">
-                <i class="fa-solid fa-ellipsis-vertical"></i> 
-                <div class="dropdown-content">
-                    <label onclick ="toggle_edit_post(<?=$post['id']?>)">
-                        <i class="fa-regular fa-pen-to-square"></i>
-                        <p>Edit</p>
-                    </label>
-                    <label onclick ="delete_post(<?=$post['id']?>)">
-                        <i class="fa-solid fa-trash"></i>
-                        <p>Delete</p>
-                    </label>
-                </div>
+           <div class="dropdown-wp">
+                <div class="dropdown ellipsis-wp">
+                    <i class="fa-solid fa-ellipsis-vertical c-black"></i>
+                    <div class="menu dropdown-content post-menu">
+                    <ul class="nav-list">
+                        <li onclick ="toggle_edit_post(<?=$post['id']?>)">
+                            <i class="fa-regular fa-pen-to-square"></i>
+                            <span>Edit</span> 
+                        </li>
+                        <li onclick ="delete_post(<?=$post['id']?>)">
+                            <i class="fa-solid fa-trash"></i>
+                            <span>Delete</span> 
+                        </li>
+                    </ul>
+                    </div>
+                </div> 
             </div>
             <?php
             }
@@ -414,6 +443,7 @@
         </div>
     </section>
     <?php
+    $postId++;
     }
     ?>
 <!-- SI EL USUARIO ESTÁ CONECTADO -->
