@@ -10,7 +10,6 @@ require_once 'model/ForumModel.php';
 // |_|   \___/|_| \_\\___/|_|  |_|  \____\___/|_| \_| |_| |_| \_\\___/|_____|_____|_____|_| \_\
                                                                                             
 class ForumController {
-    
     private $db;
     public $userController;
     private $model;
@@ -21,153 +20,122 @@ class ForumController {
         $this->model = new ForumModel($this->db);
     }
 
+    public function redirectToHome() {
+        header("Location: index.php");
+        exit();
+    }
+
     //  ____            _   _                 
     // / ___|  ___  ___| |_(_) ___  _ __  ___ 
     // \___ \ / _ \/ __| __| |/ _ \| '_ \/ __|
     //  ___) |  __/ (__| |_| | (_) | | | \__ \
     // |____/ \___|\___|\__|_|\___/|_| |_|___/
-                                           
-    // Crear una sección
+
+    // Crea una sección
     public function create_section($title, $description) {
         // Comprueba si el usuario logeado es administrador
-        if($this->userController->is_admin($this->userController->username) == false) {
-            $data['status'] = 1;
-            $data['redirectUrl'] = 'index.php?view=home&error=is_not_an_admin';
-            return $data;
+        if(!$this->userController->is_admin($this->userController->username)) {
+            return DataController::generateData(1, "", "index.php?view=home&error=is_not_an_admin");
         }
+
         // Comprueba que los datos no estén vacios
         if(empty($title) || empty($description)) {
-            $data['status'] = 1;
-            $data['redirectUrl'] = 'index.php?view=home&error=empty_data';
-            return $data;
+            return DataController::generateData(1, "", "index.php?view=home&error=empty_data");
         }
+
         // Comprueba que los datos no midan más de lo estipulado
         $trimmedDescription = strip_tags($description);
         if(strlen($title) > 100 || strlen($trimmedDescription) > 200) {
-            $data['status'] = 1;
-            $data['redirectUrl'] = 'index.php?view=home&error=incorrect_length';
-            return $data;
+            return DataController::generateData(1, "", "index.php?view=home&error=incorrect_length");
         }
 
         // Manda la orden al modelo para que se cree la sección
-        $r = $this->model->create_section($title, $description, $this->userController->user_id);
-        $data = [];
-
-        // Si el nombre de la sección ya existe, redirige a home con el error correspondiente
-        if($r === "section_name_taken") {    
-            $data['status'] = 1;
-            $data['redirectUrl'] = 'index.php?view=home&error=section_name_taken';
-            return $data;
+        $response = $this->model->create_section($title, $description, $this->userController->get_user_id());
+        if($response === "section_name_taken") {
+            return DataController::generateData(1, "", "index.php?view=home&error=section_name_taken");
         }
-        // Si la respuesta es satisfactoria
-        $data['status'] = 0;
-        $data['redirectUrl'] = 'index.php?msg=section_created_success';
-        return $data;
+        return DataController::generateData(0, "", "index.php?msg=section_created_success");
     }
 
-    // Editar una sección
+    // Edita una sección
     public function edit_section($id, $title, $description) {
-        $data = [];
         // Comprueba si el usuario logeado tiene permisos de administrador
-        if ($this->userController->is_admin == false) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'is_not_an_admin';
-            return $data;
+        if (!$this->userController->is_admin()) {
+            return DataController::generateData(1, "is_not_admin", "");
         }
+
         // Comprueba si alguno de los datos se encuentra vacío
         if (empty($id) || empty($title) || empty($description)) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'empty_data';
-            return $data;
+            return DataController::generateData(1, "empty_data", "");
         }
+
         // Comprueba que los datos no midan más de lo estipulado
         $trimmedDescription = strip_tags($description);
         if(strlen($title) > 100 || strlen($trimmedDescription) > 200) {
-            $data['status'] = 1;
-            $data['redirectUrl'] = 'index.php?view=home&error=incorrect_length';
-            return $data;
+            return DataController::generateData(1, "", "index.php?view=home&error=incorrect_length");
         }
 
-        // // Manda la orden al modelo para que se edite la sección
-        $r = $this->model->edit_section($id, $title, $description);
-
-        // Si la respuesta es negativa
-        if ($r === false) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'edit_failed';
-            return $data;
+        // Manda la orden al modelo para que se edite la sección
+        $response = $this->model->edit_section($id, $title, $description);
+        if (!$response) {
+            return DataController::generateData(1, "edit_failed", "");
         }
-
-        // Si la respuesta es satisfactoria
-        $data['status'] = 0;
-        $data['msg'] = 'ok';
-        return $data;
+        return DataController::generateData(0, "ok", "");
     }
 
-    // Eliminar una sección
+    // Elimina una sección
     public function delete_section($section_id) {
-        $data = [];
         // Comprueba si el usuario logeado tiene permisos de administrador
-        if($this->userController->is_admin($this->userController->username) == false) {
-            $data['status'] = 1;
-            $data['error'] = 'is_not_an_admin';
-            return $data;
+        if(!$this->userController->is_admin($this->userController->username)) {
+            return DataController::generateData(1, "is_not_an_admin", "");
         }
+
         // Manda la orden al modelo para que se elimine la sección
-        $r = $this->model->delete_section($section_id);
+        $response = $this->model->delete_section($section_id);
+
         // Si el id de la sección no existe
-        if($r === 'section_id_does_not_exist') {
-            $data['status'] = 1;
-            $data['error'] = 'section_id_does_not_exist';
-            return $data;
+        if($response === 'section_id_does_not_exist') {
+            return DataController::generateData(1, $response, "");
         }
+
         // Si se ha eliminado correctamente
-        $data['status'] = 0;
-        $data['error'] = '';
-        return $data;
+        return DataController::generateData(0, "", "");
     }
 
-    // Obtener la información de todas las secciones
+    // Obtiene data de todas las secciones
     public function get_sections() {
-        // Manda la orden al modelo para obtener el data de las secciones
+        // Manda la orden al modelo para obtener un array data con las secciones
         return $this->model->get_sections();
     }
-    
+
+    // Obtiene data sobre una sección
     public function get_section_data($section_id) {
         if(empty($section_id) || !is_numeric($section_id)) {
-            $data['status'] = 1;
-            $data['redirectUrl'] = "index.php";
-            $data['msg'] = "empty or not int";
-            return $data;
+            return DataController::generateData(1, "empty_or_not_int", "index.php");
         }
 
-        $r = $this->model->get_section_data($section_id);
-        if($r === 'section_not_exist') {
-            $data['status'] = 1;
-            $data['redirectUrl'] = "index.php";
-            return $data;
+        $response = $this->model->get_section_data($section_id);
+        if($response === 'section_not_exist') {
+            return DataController::generateData(1, $response, "index.php");
         }
 
         return $this->model->get_section_data($section_id);
     }
 
-    // Obtener información de todos los threads dentro de una sección
+    // Obtiene data de todos los threads dentro de una sección
     public function get_threads_section($section_id) {
         // Manda la orden al modelo para obtener el data de los threads dentro de una seccion
         return $this->model->get_threads_section($section_id);
     }
 
-    // Obtener el numero de threads dentro de una sección
-    public function  count_section_threads($section_id) {
+    // Obtiene el numero de threads dentro de una sección
+    public function count_section_threads($section_id) {
         // Manda la orden al modelo para obtener el numero de threads dentro de una sección
         return $this->model->count_section_threads($section_id);
     }
 
-    // Obtener el número de posts dentro de una sección
-    public function  count_section_posts($section_id) {
+    // Obtiene el número de posts dentro de una sección
+    public function count_section_posts($section_id) {
         // Manda la orden al modelo para obtener el número de posts dentro de una sección
         return $this->model->count_section_posts($section_id);
     }
@@ -180,149 +148,97 @@ class ForumController {
      
     // Crear un thread
     public function create_thread($title, $msg, $section_id, $user_id) {
-        $data = [];
         // Comprueba si el usuario está conectado
         if(!$this->userController->get_is_connected()) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'user_not_connected';
-            return $data;
+            return DataController::generateData(1, "user_not_connected", "");
         }
+
         // Comprueba si alguno de los datos esta vacío y lanza un error en ese caso
         if (empty($section_id) || empty($title) || empty($msg)) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'empty_data';
-            return $data;
+            return DataController::generateData(1, "empty_data", "");
         }
+
         // Comprueba que los datos no midan más de lo estipulado
         $trimmedMsg = strip_tags($msg);
         if(strlen($title) > 100 || strlen($trimmedMsg) > 2000) {
-            var_dump($msg);
-            var_dump(strlen($msg));
-            var_dump($title);
-            $data['status'] = 1;
-            $data['redirectUrl'] = 'index.php?view=home&error=incorrect_length';
-            return $data;
+            return DataController::generateData(1, "", "index.php?view=home&error=incorrect_length");
         }
 
         // Manda la orden al modelo para que se cree el thread
-        $r = $this->model->create_thread($title, $msg, $section_id, $user_id);
-
-        // Si la respuesta es false
-        if($r === false) {
-            $data['status'] = 1;
-            $data['redirectUrl'] = "index.php?view=threads&section=$section_id&msg=thread_created_error";
-            return $data;
+        $response = $this->model->create_thread($title, $msg, $section_id, $this->userController->get_user_id());
+        if(!$response) {
+            return DataController::generateData(1, "", "index.php?view=threads&section=$section_id&msg=thread_created_error");
         }
-        // Si la respuesta es true
-        $data['status'] = 0;
-        $data['redirectUrl'] = "index.php?view=threads&section=$section_id&msg=thread_created_success";
-        return $data;
+        return DataController::generateData(0, "", "index.php?view=threads&section=$section_id&msg=thread_created_success");
     }
     
     // Editar un thread
     public function edit_thread($id, $title, $msg) {
-        
         // Comprueba si el usuario está conectado
         if(!$this->userController->get_is_connected()) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'user_not_connected';
-            return $data;
+            return DataController::generateData(1, "user_not_connected", "");
         }
+
         // Comprobamos si el usuario es dueño del thread 
         if($this->model->is_user_thread_owner($id, $this->userController->get_user_id()) == false) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'user_is_not_the_owner';
-            return $data;
+            return DataController::generateData(1, "user_is_not_the_owner", "");
         }
+
         // Comprueba si algún dato está vacío
         if (empty($id) || empty($title) || empty($msg)) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'empty_data';
-            return $data;
+            return DataController::generateData(1, "empty_data", "");
         }
+
         // Comprueba que los datos no midan más de lo estipulado
         $trimmedMsg = strip_tags($msg);
         if(strlen($title) > 100 || strlen($trimmedMsg) > 2000) {
-            $data['status'] = 1;
-            $data['redirectUrl'] = 'index.php?view=home&error=incorrect_length';
-            return $data;
+            return DataController::generateData(1, "incorrect_length", "index.php?view=home&error=incorrect_length");
         }
 
         // Manda la orden al modelo para editar el thread
-        $data = [];
-        $r = $this->model->edit_thread($id, $title, $msg);
-
-        // Si la respuesta es que el thread no existe, manda el siguiente error
-        if($r === 'thread_id_does_not_exist') {
-            return [ "status" => 1, "error" => "thread_id_does_not_exist" ];
+        $response = $this->model->edit_thread($id, $title, $msg);
+        if($response === 'thread_id_does_not_exist') {
+            return DataController::generateData(1, "thread_id_does_not_exist", "");
         }
-        // Si la respuesta es satisfactoria redirige a la vista correspondiente
-        return [ "status" => 0, "redirectUrl" => "index.php?view=threads&section=$id&msg=thread_edit_success" ];
+        return DataController::generateData(0, "", "index.php?view=threads&section=$id&msg=thread_edit_success");
     }
     
     // Eliminar un thread
     public function delete_thread($id) {
-
         // Comprueba si el usuario está conectado
         if(!$this->userController->get_is_connected()) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'user_not_connected';
-            return $data;
+            return DataController::generateData(1, "user_not_connected", "");
         }
+
         // Comprueba si el usuario es dueño del thread
         if($this->model->is_user_thread_owner($id, $this->userController->get_user_id()) == false) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'user_not_owner';
-            return $data;
+            return DataController::generateData(1, "user_not_owner", "");
         }
 
         // Manda la orden al modelo para eliminar el thread
-        $data = [];
-        $r = $this->model->delete_thread($id, $this->userController->get_user_id());
+        $response = $this->model->delete_thread($id, $this->userController->get_user_id());
        
         // Si la respuesta es que el thread no existe
-        if($r === 'thread_id_does_not_exist') {
-            $data['status'] = 1;
-            $data['error'] = 'thread_id_does_not_exist';
-            return $data;
+        if($response === 'thread_id_does_not_exist') {
+            return DataController::generateData(1, $response, "");
         }
-
-        // Si la respuesta es true
-        $data['status'] = 0;
-        $data['redirectUrl'] = "index.php";
-        return $data;
+        return DataController::generateData(0, "", "index.php");
     }
 
     // Obtner la información de un thread
-    public function get_thread ($thread_id) {
-        if(empty($thread_id)) {
-           return [
-                "status" => 1,
-                "msg" => 'error',
-                "error" => 'empty_thread_id',
-                "redirectUrl" => 'index.php'
-            ];
+    public function get_thread ($id) {
+        if(empty($id)) {
+            return DataController::generateData(1, "empty_thread_id", "index.php");
         }
+
         // Manda la orden al modelo para obtener el data de un thread
-        $r = $this->model->get_thread($thread_id);
+        $response = $this->model->get_thread($id);
+
         // Si la respuesta es que el thread no existe
-        if($r === 'thread_not_found' ) {
-            return [
-                "status" => 1,
-                "msg" => 'error',
-                "error" => 'thread_not_found',
-                "redirectUrl" => 'index.php'
-            ];
+        if($response === 'thread_not_found' ) {
+            return DataController::generateData(1, $response, "index.php");
         }
-        // Retorna la respuesta
-        return $r;
+        return $response;
     }
 
     // Obtener la información de todos los posts dentro de un thread
@@ -345,125 +261,92 @@ class ForumController {
     public function create_post($section_id, $thread_id, $user_id, $msg) {
         // Comprueba si el usuario está conectado
         if(!$this->userController->get_is_connected()) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'user_not_connected';
-            return $data;
+            return DataController::generateData(1, "user_not_connected", "");
         }
+
         // Comprueba si alguno de los datos está vacío
         if (empty($section_id) || empty($thread_id) || empty($user_id) || empty($msg)) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'empty_data';
-            return $data;
+            return DataController::generateData(1, "empty_data", "");
         }
+
         // Comprueba que el msg no mida más de lo estipulado
         $trimmedMsg = strip_tags($msg);
         if(strlen($trimmedMsg) > 2000) {
-            $data['status'] = 1;
-            $data['redirectUrl'] = 'index.php?view=home&error=incorrect_length';
-            return $data;
+            return DataController::generateData(1, "", "index.php?view=home&error=incorrect_length");
         }
         
         // Manda la orden al modelo para que se cree el post
-        $data = [];
-        $r = $this->model->create_post($section_id, $thread_id, $user_id, $msg);
+        $response = $this->model->create_post($section_id, $thread_id, $user_id, $msg);
 
         // Si la respuesta es false
-        if($r === false) {
-            $data['status'] = 1;
-            $data['redirectUrl'] = "index.php?view=posts&thread=$thread_id&msg=post_created_error";
-            return $data;
+        if(!$response) {
+            return DataController::generateData(1, "post_created_error", "index.php?view=posts&thread=$thread_id&msg=post_created_error");
         }
-        // Si la respuesta es true
-        $data['status'] = 0;
-        $data['redirectUrl'] = "index.php?view=posts&thread=$thread_id&msg=post_created_success";
-        return $data;
+        return DataController::generateData(0, "post_created_success", "index.php?view=posts&thread=$thread_id&msg=post_created_success");
     }
-
+    
     // Editar un post
     public function edit_post($post_id, $msg) {
         
         // Comprueba si el usuario está conectado
         if(!$this->userController->get_is_connected()) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'user_not_connected';
-            return $data;
+            return DataController::generateData(1, "user_not_connected", "");
         }
+
         // Comprueba si el usuario es dueño del post 
         if($this->model->is_user_post_owner($post_id, $this->userController->get_user_id()) == false) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'user_is_not_the_owner';
-            return $data;
+            return DataController::generateData(1, "user_is_not_the_owner", "");
         }
+
         // Comprueba si está vacío
         if (empty($post_id) || empty($msg)) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'empty_data';
-            return $data;
+            return DataController::generateData(1, "empty_data", "");
         }
+
         // Comprueba que el msg no mida más de lo estipulado
         $trimmedMsg = strip_tags($msg);
         if(strlen($trimmedMsg) > 2000) {
-            $data['status'] = 1;
-            $data['redirectUrl'] = 'index.php?view=home&error=incorrect_length';
-            return $data;
+            return DataController::generateData(1, "incorrect_length", "index.php?view=home&error=incorrect_length");
         }
 
         // Manda la orden al modelo para que edite el post
-        $data = [];
-        $r = $this->model->edit_post($post_id, $msg);
+        $response = $this->model->edit_post($post_id, $msg);
 
         // Si la respuesta es que el post no exite
-        if($r === 'post_not_exist') {
-            return [ "status" => 1, "error" => "post_not_exist" ];
+        if($response === 'post_not_exist') {
+            return DataController::generateData(1, $response, "");
         }
 
-        return [ "status" => 0, "redirectUrl" => "index.php?view=posts" ];
+        return DataController::generateData(0, "ok", "index.php?view=posts");
     }
 
     // Eliminar un post
     public function delete_post($post_id) {
-
         // Comprueba si el usuario está conectado
         if(!$this->userController->get_is_connected()) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'user_not_connected';
-            return $data;
+            return DataController::generateData(1, "user_not_connected", "");
         }
+
         // Comprueba si el usuario es dueño del thread
         if($this->model->is_user_post_owner($post_id, $this->userController->get_user_id()) == false) {
-            $data['status'] = 1;
-            $data['msg'] = 'error';
-            $data['error'] = 'user_not_owner';
-            return $data;
+            return DataController::generateData(1, "user_not_owner", "");
         }
 
         // Manda la orden al modelo para que elimine el post
-        $data = [];
-        $r = $this->model->delete_post($post_id, $this->userController->get_user_id());
+        $response = $this->model->delete_post($post_id, $this->userController->get_user_id());
        
         // Si la respuesta es que el post no existe
-        if($r === 'post_not_exist') {
-            $data['status'] = 1;
-            $data['error'] = 'post_not_exist';
-            return $data;
+        if($response === 'post_not_exist') {
+            return DataController::generateData(1, "post_not_exist", "");
         }
 
-        $data['status'] = 0;
-        return $data;
+        return DataController::generateData(0, "ok", "");
     }                    
     
     // Obtener la información de un post
     public function get_post ($post_id) {
-       // Comprueba si el post contiene un id
         if(empty($post_id)) {
-            return false;
-            throw new Error('Empty Post Id');
+            return DataController::generateData(1, "empty_post_id", "");
         }
         return $this->model->get_post($post_id);
     }
@@ -475,27 +358,31 @@ class ForumController {
     // |_|   |_|  \___/|_| |_|_|\___|
 
     // Obtener el nombre de usuario por su id
-    public function get_username_by_user_id($user_id) {
+    public function get_username_by_user_id($id) {
         // Manda la orden al modelo para obtener el nombre de usuario
-        $username = $this->model->get_username_by_user_id($user_id);
+        $username = $this->model->get_username_by_user_id($id);
+
         // Si no existe nombre de usuario
-        if($username === false) {
-            return "error_username";
+        if(!$username) {
+            return DataController::generateData(1, "error_username", "");
         }
+
         // Retorna el nombre de usuario
-        return  $username;
+        return $username;
     }
 
     // Obtener la fecha de registro de un usuario por su id
     public function get_joined_date_by_user_id($user_id) {
         // Manda la orden al modelo para obtener la fecha de regisgtro del usuario
-        $joined_date = $this->model->get_joined_date_by_user_id($user_id);
+        $response = $this->model->get_joined_date_by_user_id($user_id);
+
         // Si no se encuentra la fecha
-        if($joined_date === false) {
-            return "error_joined_date";
+        if(!$response) {
+            return DataController::generateData(1, "error_joined_date", "");
         }
+
         // Retorna la fecha
-        return  $joined_date;
+        return $response;
     }
 }
 ?>

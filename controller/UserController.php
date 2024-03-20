@@ -27,13 +27,27 @@
 
             if(isset($_SESSION['username'])) {
                 $this->model->load_profile($_SESSION['username']);
+                $this->is_connected = true;
                 $this->username = $this->model->username;
                 $this->user_id = $this->model->user_id;
                 $this->is_admin = $this->model->is_admin;
-                $this->is_connected = true;
                 $this->total_threads = $this->model->total_threads;
                 $this->total_posts = $this->model->total_posts;
                 $this->registration_date = $this->model->registration_date;
+            }
+        }
+
+        public function loginRequired() {
+            if(!$this->get_is_connected()) {
+                header("Location: index.php?view=home&error=user_not_connected");
+                exit();
+            }
+        }
+
+        public function requireNotLoggedIn() {
+            if($this->get_is_connected()) {
+                header("Location: index.php?view=home");
+                exit();
             }
         }
 
@@ -84,8 +98,8 @@
             return $data;
         }
 
-        public function register($username, $email, $password, $privileges) {
-            $r = $this->model->register($username, $email, $password, $privileges);
+        public function register($username, $email, $password) {
+            $r = $this->model->register($username, $email, $password);
             $data = [];
 
             if($r === "username_taken") {    
@@ -108,53 +122,34 @@
             return $data;
         }
 
-        public function edit_password($id, $password, $currentpass) {
-            
-            $data = [];
-             // Comprueba si el usuario esta logeado y concide con el usuario a editar
-            if ($this->get_is_connected() == false || $this->get_user_id() !== $id) {
-                $data['status'] = 1;
-                $data['msg'] = 'error';
-                $data['error'] = 'not_correct_user';
-                return $data;
+        public function edit_password($password, $currentpass) {
+            // Comprueba si el usuario esta logeado y concide con el usuario a editar
+            if (!$this->get_is_connected()) {
+                return DataController::generateData(1, "user_not_connected", ""); 
             }
 
             // Comprueba si alguno de los datos se encuentra vacío
-            if (empty($id) || empty($password)) {
-                $data['status'] = 1;
-                $data['msg'] = 'error';
-                $data['error'] = 'empty_data';
-                return $data;
+            if (empty($password) || empty($currentpass)) {
+                return DataController::generateData(1, "empty_data", "");
             }
 
             // Comprueba si la contraseña actual es correcta antes de actualizarla
-            if($this->model->is_correct_password($id, $currentpass) === false) {
-                
-                exit();
-                $data['status'] = 1;
-                $data['msg'] = 'error';
-                $data['error'] = 'incorrect_pass';
-                return $data;
+            if(!$this->model->is_correct_password($this->get_user_id(), $currentpass)) {
+                return DataController::generateData(1, "incorrect_pass", "");
             }
 
             // // Manda la orden al modelo para que se edite la sección
-            $r = $this->model->edit_password($id, $password);
+            $response = $this->model->edit_password($this->get_user_id(), $password);
 
             // Si la respuesta es negativa
-            if ($r === false) {
-                $data['status'] = 1;
-                $data['msg'] = 'error';
-                $data['error'] = 'edit_failed';
-                return $data;
+            if (!$response) {
+                return DataController::generateData(1, "edit_failed", "");
             }
 
             // Si la respuesta es satisfactoria
-            $data['status'] = 0;
-            $data['msg'] = 'ok';
-            return $data;
+            return DataController::generateData(0, "ok", "");
         }
 
-        // Example of mail sending when the user registers
         private function sendRegistrationMail ($username) {
             $to = $this->model->getData($username, 'email');
             $from = "admin@seas-vm.test";

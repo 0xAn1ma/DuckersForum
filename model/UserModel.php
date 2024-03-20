@@ -106,13 +106,13 @@
             
         }
 
-        public function register($username, $email, $password, $privileges) {
+        public function register($username, $email, $password) {
             if($this->is_registered($username) == true) {
                 return "username_taken";
             }
 
             $registration_date = date('Y-m-d H:i:s');
-            $query = "INSERT INTO users SET username=:username, email=:email, password=:password, privileges=:privileges, registration_date=:registration_date";
+            $query = "INSERT INTO users SET username=:username, email=:email, password=:password, privileges='user', registration_date=:registration_date";
             $stmt = $this->conn->prepare($query);
 
             // sanitize
@@ -123,15 +123,12 @@
             $username = $this->sanitize($username);
             $email = $this->sanitize($email);
             $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $privileges = $this->sanitize($privileges);
 
             // bind values
             $stmt->bindParam(":username", $username);
             $stmt->bindParam(":email", $email);
             $stmt->bindParam(":password", $password);
-            $stmt->bindParam(":privileges", $privileges);
             $stmt->bindParam(":registration_date", $registration_date);
-
 
             if($stmt->execute()) {
                 return true;
