@@ -41,7 +41,7 @@ async function create_thread() {
         const jsonData = await response.json()
         console.log(jsonData)
         if (jsonData.status === 0) {
-            window.location.href = window.location.href
+            window.location.href = jsonData.redirectUrl
         }
     }
     catch (e) {
@@ -151,8 +151,8 @@ tinymce.init({
             </div> 
         </article>
         <?php
-        // SI EL USUARIO ES EL CREADOR DEL THREAD
-        if($userController->get_is_connected() && $thread['user_id'] == $userController->get_user_id()) {
+        // SI EL USUARIO ES EL CREADOR DEL THREAD O ES ADMIN
+        if($userController->get_is_connected() && $thread['user_id'] == $userController->get_user_id() || $userController->get_is_connected() && $userController->get_is_admin()) {
         ?>
         <div class="dropdown-wp">
             <div class="dropdown ellipsis-wp">

@@ -166,7 +166,7 @@
             $stmt->bindParam(":section_id", $section_id);
             $stmt->bindParam(":user_id", $user_id);
             if($stmt->execute()) {
-                return true;
+                return $this->conn->lastInsertId();
             }
             return false;
         }
@@ -197,15 +197,14 @@
         }
 
         // Eliminar un thread
-        public function delete_thread($thread_id, $user_id) {
+        public function delete_thread($thread_id) {
             if(!$this->does_thread_exist($thread_id)) {
                 return "thread_not_exist";
             }
             // Elimina los posts que existen dentro del thread
             $this->delete_posts_from_thread($thread_id);
-            $stmt = $this->conn->prepare("DELETE FROM threads WHERE id=:thread_id AND user_id=:user_id");
+            $stmt = $this->conn->prepare("DELETE FROM threads WHERE id=:thread_id");
             $stmt->bindParam(":thread_id", $thread_id);
-            $stmt->bindParam(":user_id", $user_id);
             if($stmt->execute()) {
                 return true;
             }
@@ -307,13 +306,12 @@
         }
 
         // Elimina un post
-        public function delete_post($post_id, $user_id) {
+        public function delete_post($post_id) {
             if(!$this->does_post_exist($post_id)) {
                 return "post_not_exist";
             }
-            $stmt = $this->conn->prepare("DELETE FROM posts WHERE id=:post_id AND user_id=:user_id");
+            $stmt = $this->conn->prepare("DELETE FROM posts WHERE id=:post_id");
             $stmt->bindParam(":post_id", $post_id);
-            $stmt->bindParam(":user_id", $user_id);
             if($stmt->execute()) {
                 return true;
             }

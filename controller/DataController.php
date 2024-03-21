@@ -18,6 +18,10 @@ class DataController {
         header('Content-Type: application/json');
         echo(json_encode($jsonData));
     }
+
+    public static function debugData($data) {
+        echo '<pre>' , var_dump($data) , '</pre>';
+    }
 }
 
 ?>

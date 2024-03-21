@@ -144,11 +144,13 @@
             return;
         }
 
-        const response = await fetch(`index.php?action=delete_thread&id=${threadId}`) 
+        const response = await fetch(`index.php?action=delete_thread&id=${threadId}`)
+        console.log(await response.text())
+
         const jsonData = await response.json()
 
         if(jsonData.status === 0) {
-            window.location.href = jsonData['redirectUrl']
+            //window.location.href = jsonData['redirectUrl']
         }
     }
 
@@ -181,9 +183,10 @@
        if (!confirm('Are you sure you want to edit this post?')) {
             return
         }
-
-        const msgValue = document.querySelector('.esmsg_input').value
         
+        //const msgValue = document.querySelector('.esmsg_input').value
+        const msgValue = tinymce.activeEditor.getContent('.esmsg_input')
+
         // Llamar al servidor para editar la seccion
         try {
             const response = await fetch("index.php?action=edit_post", {
@@ -347,8 +350,8 @@
                 <h3 class="thread_title_<?=$data['thread']['id']?>"><?=$data['thread']['title']?></h3>
             </section>
             <?php
-            // SI EL USUARIO ES EL CREADOR DEL THREAD
-            if($userController->get_is_connected() && $data['thread']['user_id'] == $userController->get_user_id()) {
+            // SI EL USUARIO ES EL CREADOR DEL THREAD O ES ADMIN
+            if($userController->get_is_connected() && $data['thread']['user_id'] == $userController->get_user_id() || $userController->get_is_connected() && $userController->get_is_admin()) {
             ?>
             <div class="dropdown-wp">
                 <div class="dropdown ellipsis-wp">
@@ -402,8 +405,8 @@
                 <p class="reference">#<?=$postId?></p>
             </section>
             <?php 
-            // SI EL USUARIO ES EL CREADOR DEL POST
-            if($userController->get_is_connected() && $post['user_id'] == $userController->get_user_id()) {
+            // SI EL USUARIO ES EL CREADOR DEL POST O ES ADMIN
+            if($userController->get_is_connected() && $post['user_id'] == $userController->get_user_id() || $userController->get_is_connected() && $userController->get_is_admin()) {
             ?>
            <div class="dropdown-wp">
                 <div class="dropdown ellipsis-wp">

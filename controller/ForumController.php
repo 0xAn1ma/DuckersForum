@@ -119,7 +119,7 @@ class ForumController {
             return DataController::generateData(1, $response, "index.php");
         }
 
-        return $this->model->get_section_data($section_id);
+        return DataController::generateData(0, "ok", "", ["section" => $this->model->get_section_data($section_id)]);
     }
 
     // Obtiene data de todos los threads dentro de una sección
@@ -175,7 +175,7 @@ class ForumController {
         if(!$response) {
             return DataController::generateData(1, "", "index.php?view=threads&section=$section_id&msg=thread_created_error");
         }
-        return DataController::generateData(0, "", "index.php?view=threads&section=$section_id&msg=thread_created_success");
+        return DataController::generateData(0, "", "index.php?view=posts&section=$section_id&thread=$response");
     }
     
     // Editar un thread
@@ -184,15 +184,15 @@ class ForumController {
         if(!$this->userController->get_is_connected()) {
             return DataController::generateData(1, "user_not_connected", "");
         }
-
-        // Comprobamos si el usuario es dueño del thread 
-        if($this->model->is_user_thread_owner($id, $this->userController->get_user_id()) == false) {
-            return DataController::generateData(1, "user_is_not_the_owner", "");
-        }
-
+        
         // Comprueba si algún dato está vacío
         if (empty($id) || empty($title) || empty($msg)) {
             return DataController::generateData(1, "empty_data", "");
+        }
+
+        // Comprobamos si el usuario es dueño del thread o tiene permiso de admin
+        if(!$this->model->is_user_thread_owner($id, $this->userController->get_user_id()) && !$this->userController->get_is_admin()) {
+            return DataController::generateData(1, "action_not_allowed", "");
         }
 
         // Comprueba que los datos no midan más de lo estipulado
@@ -216,19 +216,19 @@ class ForumController {
             return DataController::generateData(1, "user_not_connected", "");
         }
 
-        // Comprueba si el usuario es dueño del thread
-        if($this->model->is_user_thread_owner($id, $this->userController->get_user_id()) == false) {
-            return DataController::generateData(1, "user_not_owner", "");
+        // Comprobamos si el usuario es dueño del thread o tiene permiso de admin
+        if(!$this->model->is_user_thread_owner($id, $this->userController->get_user_id()) && !$this->userController->get_is_admin()) {
+            return DataController::generateData(1, "action_not_allowed", "");
         }
 
         // Manda la orden al modelo para eliminar el thread
-        $response = $this->model->delete_thread($id, $this->userController->get_user_id());
+        $response = $this->model->delete_thread($id);
        
         // Si la respuesta es que el thread no existe
-        if($response === 'thread_id_does_not_exist') {
+        if($response === 'thread_not_exist') {
             return DataController::generateData(1, $response, "");
         }
-        return DataController::generateData(0, "", "index.php");
+        return DataController::generateData(0, "ok", "index.php");
     }
 
     // Obtner la información de un thread
@@ -238,19 +238,19 @@ class ForumController {
         }
 
         $sectionResponse = $this->get_section_data($section_id);
-        if ($sectionResponse === "section_not_exist") {
+        if ($sectionResponse['status'] === 1) {
             return DataController::generateData(1, $sectionResponse, "");
         }
 
         // Manda la orden al modelo para obtener el data de un thread
         $threadResponse = $this->model->get_thread($thread_id);
-        if($threadResponse === 'thread_not_found' ) {
+        if($threadResponse === 'thread_not_exist' ) {
             return DataController::generateData(1, $threadResponse, "");
         }
         $postsResponse = $this->get_thread_posts($thread_id);
 
         return DataController::generateData(0, "ok", "", [
-            "section" => $sectionResponse,
+            "section" => $sectionResponse['data']['section'],
             "thread" => $threadResponse,
             "posts" => $postsResponse
         ]);
@@ -302,15 +302,9 @@ class ForumController {
     
     // Editar un post
     public function edit_post($post_id, $msg) {
-        
         // Comprueba si el usuario está conectado
         if(!$this->userController->get_is_connected()) {
             return DataController::generateData(1, "user_not_connected", "");
-        }
-
-        // Comprueba si el usuario es dueño del post 
-        if($this->model->is_user_post_owner($post_id, $this->userController->get_user_id()) == false) {
-            return DataController::generateData(1, "user_is_not_the_owner", "");
         }
 
         // Comprueba si está vacío
@@ -324,14 +318,17 @@ class ForumController {
             return DataController::generateData(1, "incorrect_length", "index.php?view=home&error=incorrect_length");
         }
 
+        // Comprobamos si el usuario es dueño del post o tiene permiso de admin
+        if(!$this->model->is_user_post_owner($post_id, $this->userController->get_user_id()) && !$this->userController->get_is_admin()) {
+            return DataController::generateData(1, "action_not_allowed", "");
+        }
+
         // Manda la orden al modelo para que edite el post
         $response = $this->model->edit_post($post_id, $msg);
-
         // Si la respuesta es que el post no exite
         if($response === 'post_not_exist') {
             return DataController::generateData(1, $response, "");
         }
-
         return DataController::generateData(0, "ok", "index.php?view=posts");
     }
 
@@ -342,13 +339,13 @@ class ForumController {
             return DataController::generateData(1, "user_not_connected", "");
         }
 
-        // Comprueba si el usuario es dueño del thread
-        if($this->model->is_user_post_owner($post_id, $this->userController->get_user_id()) == false) {
-            return DataController::generateData(1, "user_not_owner", "");
+        // Comprobamos si el usuario es dueño del post o tiene permiso de admin
+        if(!$this->model->is_user_post_owner($post_id, $this->userController->get_user_id()) && !$this->userController->get_is_admin()) {
+            return DataController::generateData(1, "action_not_allowed", "");
         }
 
         // Manda la orden al modelo para que elimine el post
-        $response = $this->model->delete_post($post_id, $this->userController->get_user_id());
+        $response = $this->model->delete_post($post_id);
        
         // Si la respuesta es que el post no existe
         if($response === 'post_not_exist') {
