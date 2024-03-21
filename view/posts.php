@@ -340,8 +340,25 @@
             </span>
         </span>
     </ul>
-</nav>  
+</nav>
+
 <div id="posts-wp">
+    <div style="padding: 20px;">
+        <span><b>Pages:</b> </span>
+        <?php
+        $numberOfPages = ceil($data['posts_count'][0] / 5);
+        for ($i = 1; $i <= $numberOfPages; $i++) {
+        ?>
+        <a style="margin-right: 2px;" href="index.php?view=posts&section=<?=$data['section']['id']?>&thread=<?=$data['thread']['id']?>&page=<?=$i?>"><?=$i?></a>
+        <?php
+        }
+        ?>
+        
+    </div>
+    <?php
+    if (!isset($_GET['page']) || isset($_GET['page']) && $_GET['page'] === "1") {
+        $postId = 2;
+    ?>
     <!-- THREAD -->
     <section class="complete-thread thread_<?=$data['thread']['id']?> thread_content_<?=$data['thread']['id']?>">
         <div class="thread-title-wp">
@@ -392,11 +409,15 @@
             </article>
         </div>
     </section>
-
+    <?php
+    }
+    ?>
     <!-- POST -->
     <?php
     // POR CADA POST
-    $postId = 2;
+    if (isset($_GET['page']) && $_GET['page'] !== "1") {
+        $postId = $_GET['page'] + 5 - 1;
+    }
     foreach($data['posts'] as $post) {
     ?>
     <section class="complete-post">
@@ -404,7 +425,7 @@
             <section  class="reference-wp">
                 <p class="reference">#<?=$postId?></p>
             </section>
-            <?php 
+            <?php
             // SI EL USUARIO ES EL CREADOR DEL POST O ES ADMIN
             if($userController->get_is_connected() && $post['user_id'] == $userController->get_user_id() || $userController->get_is_connected() && $userController->get_is_admin()) {
             ?>
@@ -453,6 +474,7 @@
     ?>
 <!-- SI EL USUARIO ESTÁ CONECTADO -->
 </div>
+
 <?php if($userController->get_is_connected()) {
 ?>
     <div id="create-post-wp">

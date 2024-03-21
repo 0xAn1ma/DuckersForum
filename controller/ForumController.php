@@ -151,7 +151,7 @@ class ForumController {
     //   | | | '_ \| '__/ _ \/ _` |/ _` / __|
     //   | | | | | | | |  __/ (_| | (_| \__ \
     //   |_| |_| |_|_|  \___|\__,_|\__,_|___/
-     
+
     // Crear un thread
     public function create_thread($title, $msg, $section_id, $user_id) {
         // Comprueba si el usuario está conectado
@@ -232,7 +232,8 @@ class ForumController {
     }
 
     // Obtner la información de un thread
-    public function get_thread ($section_id, $thread_id) {
+    public function get_thread ($section_id, $thread_id, $page) {
+        
         if(empty($thread_id) || empty($section_id)) {
             return DataController::generateData(1, "empty_thread_id", "");
         }
@@ -247,18 +248,23 @@ class ForumController {
         if($threadResponse === 'thread_not_exist' ) {
             return DataController::generateData(1, $threadResponse, "");
         }
-        $postsResponse = $this->get_thread_posts($thread_id);
+
+        $limit_per_page = 5;
+        $first_limit = ($page - 1) * $limit_per_page;
+        $postsResponse = $this->get_thread_posts($thread_id, $first_limit, $limit_per_page);
+        $postsCount = $this->model->count_thread_posts($thread_id);
 
         return DataController::generateData(0, "ok", "", [
             "section" => $sectionResponse['data']['section'],
             "thread" => $threadResponse,
-            "posts" => $postsResponse
+            "posts" => $postsResponse,
+            "posts_count" => [$postsCount]
         ]);
     }
 
     // Obtener la información de todos los posts dentro de un thread
-    public function get_thread_posts($thread_id) {
-        return $this->model->get_thread_posts($thread_id);
+    public function get_thread_posts($thread_id, $limit, $max_rows) {
+        return $this->model->get_thread_posts($thread_id, $limit, $max_rows);
     }
 
     // Obtener el número de posts o replies que contiene un thread

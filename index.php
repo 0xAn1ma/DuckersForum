@@ -184,7 +184,7 @@
 
         // POSTS
         if ($_GET['view'] === 'posts') {
-            $response = $forumController->get_thread($_GET['section'], $_GET['thread']);
+            $response = $forumController->get_thread($_GET['section'], $_GET['thread'], !isset($_GET['page']) ? 1 : $_GET['page']);
             if($response['status'] === 1) {
                 $forumController->redirectToHome();
             }

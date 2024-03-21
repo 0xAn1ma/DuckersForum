@@ -223,9 +223,11 @@
         }
 
         // Obtener los replies o posts de un thread
-        public function get_thread_posts($thread_id) {
-            $stmt = $this->conn->prepare("SELECT * FROM posts WHERE thread_id=:thread_id");
+        public function get_thread_posts($thread_id, $limit, $max_rows) {
+            $stmt = $this->conn->prepare("SELECT * FROM posts WHERE thread_id=:thread_id LIMIT :limit,:max_rows");
             $stmt->bindParam(":thread_id", $thread_id);
+            $stmt->bindValue(':limit', (int) trim($limit), PDO::PARAM_INT);
+            $stmt->bindValue(':max_rows', (int) trim($max_rows), PDO::PARAM_INT);
             $stmt->execute();
             if ($stmt->rowCount() > 0) {
                 return $stmt->fetchAll(PDO::FETCH_ASSOC);
