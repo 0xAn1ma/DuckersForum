@@ -135,7 +135,7 @@
         }
 
         // Comprueba si un usuario existe
-        function does_user_exist($id) {
+        public function does_user_exist($id) {
    
             $query = "SELECT id FROM users WHERE id=:id";
             $stmt = $this->conn->prepare($query);
@@ -170,6 +170,22 @@
             if($stmt->execute()) {return true;}
             return false;
         }
+
+        public function delete_account($username) {
+            if(!$this->is_registered($username)) {
+                return false;
+            }
+
+            $query = "UPDATE users SET username='DeletedAcc', avatar='' WHERE username=:username";
+            $stmt = $this->conn->prepare($query);
+            $username = $this->sanitize($username);
+            $stmt->bindParam(":username", $username);
+            $stmt->execute();
+
+            return true;
+        }
+
+
 
         //      ____      _     ____        _        
         //     / ___| ___| |_  |  _ \  __ _| |_ __ _ 

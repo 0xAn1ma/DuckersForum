@@ -47,11 +47,6 @@
     let editToggled = false
 
     async function edit_section(sectionId) {
-       // Confirmar antes de editar
-        if (!confirm('Are you sure you want to edit this section?')) {
-            return
-        }
-
         const titleValue = document.querySelector('.estitle_input').value
         const descValue = document.querySelector('.esdesc_input').value
         
@@ -66,13 +61,15 @@
                     id: sectionId
                 })
             })
+            // console.log(await response.text())
             const json = await response.json()
             if (json.msg === 'ok') {
                 window.location.href = window.location.href
             }
+            
         }
         catch (e) {
-            // console.log(e)
+            console.log(e)
         }
         // Volver a mostrar los elementos HTML como antes (h2, p)
     }
@@ -86,11 +83,21 @@
         const title = document.querySelector(`.section_title_${sectionId}`)
         const description = document.querySelector(`.section_desc_${sectionId}`)
         const content = document.querySelector(`.section_content_${sectionId}`)
+
+        //Replace content class
+        content.style.display = 'flex'
+        content.style.width = '90%'
+
+
         // Replace title with input
         const titleInput = document.createElement('input')
         titleInput.value = title.textContent;
         titleInput.classList = "estitle_input"
+        title.parentElement.addEventListener("click", function(e){
+            e.preventDefault();
+        })
         title.parentNode.replaceChild(titleInput, title);
+        
 
         // Replace description with input
         const descriptionInput = document.createElement('input')
@@ -102,6 +109,7 @@
         // Create sendButton
         const sendButton = document.createElement('button')
         sendButton.textContent = "Edit"
+        sendButton.classList = "edit_section_button"
         sendButton.onclick = function() {
             edit_section(sectionId)
         }

@@ -1,6 +1,5 @@
 <?php
 // Dependencies
-require_once 'config/Database.php';
 require_once 'model/ForumModel.php';
 
 //  _____ ___  ____  _   _ __  __    ____ ___  _   _ _____ ____   ___  _     _     _____ ____  
@@ -14,8 +13,8 @@ class ForumController {
     public $userController;
     private $model;
 
-    public function __construct($userController) {
-        $this->db = (new Database())->getConnection();
+    public function __construct($db, $userController) {
+        $this->db = $db;
         $this->userController = $userController;
         $this->model = new ForumModel($this->db);
     }
@@ -50,7 +49,7 @@ class ForumController {
         }
 
         // Manda la orden al modelo para que se cree la sección
-        $response = $this->model->create_section($title, $description, $this->userController->get_user_id());
+        $response = $this->model->create_section($title, strip_tags($description), $this->userController->get_user_id());
         if($response === "section_name_taken") {
             return DataController::generateData(1, "", "index.php?view=home&error=section_name_taken");
         }
@@ -60,7 +59,7 @@ class ForumController {
     // Edita una sección
     public function edit_section($id, $title, $description) {
         // Comprueba si el usuario logeado tiene permisos de administrador
-        if (!$this->userController->is_admin()) {
+        if (!$this->userController->get_is_admin()) {
             return DataController::generateData(1, "is_not_admin", "");
         }
 

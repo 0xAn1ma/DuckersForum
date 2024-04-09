@@ -1,5 +1,63 @@
 <script type="text/javascript">
-   
+    async function deleteAccount() {
+        const password = document.querySelector('.password').value
+        const confirmPassword = document.querySelector('.confirm-pass').value
+        const passWp = document.querySelector('.password')
+        const confirmPassWp = document.querySelector('.confirm-pass')
+
+        // Comprobar que ningún campo está vacio
+        if(!password || !confirmPassword) {
+            if(!password) {
+                passWp.style.border = '1px solid red'
+            }
+            if(!confirmPassword) {
+                confirmPassWp.style.border = '1px solid red'
+            }
+            return false
+        }
+
+        // Comprobar que las dos contraseñas coinciden
+        if(password !== confirmPassword) {
+            passWp.style.border = '1px solid red'
+            confirmPassWp.style.border = '1px solid red'
+            document.querySelector('.password').value = ""
+            document.querySelector('.confirm-pass').value = ""
+            return
+        }
+
+        // Confirmar antes de eliminar
+        if (!confirm('Are you sure you want to delete this account?')) {
+            return;
+        }
+
+        // Llamar al servidor para eliminar la cuenta
+        try {
+            const response = await fetch("index.php?action=delete_account", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    password: confirmPassword
+                })
+            })
+            //console.log( await response.text())
+            const jsonData = await response.json()
+            console.log(jsonData)
+            if (jsonData.status === 0) {
+                window.location.href = jsonData.redirectUrl
+            }
+            if (jsonData.status === 1) {
+                passWp.style.border = '1px solid red'
+                confirmPassWp.style.border = '1px solid red'
+                document.querySelector('.password').value = ""
+                document.querySelector('.confirm-pass').value = ""
+            }
+        }
+        catch (e) {
+            console.log(e)
+        }
+
+    }
+
    async function editPassword() {
         const currentPass = document.querySelector('.current-password').value
         const newPass = document.querySelector('.new-password').value
@@ -43,7 +101,7 @@
                     currentpass: currentPass
                 })
             })
-            console.log( await response.text())
+            //console.log( await response.text())
             const jsonData = await response.json()
             console.log(jsonData)
             if (jsonData.status === 0) {
@@ -54,6 +112,9 @@
             console.log(e)
         }
     }
+
+
+
     window.onload = (event) => {
         document.getElementById('avatar').addEventListener('change', async function() {
             if (this.files && this.files[0]) {
@@ -63,7 +124,10 @@
                     method: 'POST',
                     body: formData,
                 });
+                // console.log(await response.text())
+                // return 
                 const jsonData = await response.json()
+                console.log(jsonData)
                 if (jsonData.status === 1) { return }
                 document.getElementById("avatarimg").src = "uploads/" + jsonData.data.filename
             }
@@ -92,7 +156,7 @@
     <article class="user-profile-wp">
         <div class="img-profile-wp">
             <label for="avatar"><img id="avatarimg" src="<?=$avatarSrc?>" alt="avatar" width="100" height="100"><i class="fa-solid fa-camera camera"></i></label>
-            <input style="display:none" type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" />
+            <input style="display:none" type="file" id="avatar" name="avatar" accept="image/png, image/jpeg, image/gif" />
         </div>
         <div class="username-profile-wp">
             <p><?=$_SESSION['username']?></p>
@@ -122,6 +186,19 @@
         </div>
         <div class="pass-submit-wp">
             <button class="submit" onclick="editPassword()">Edit password</button>
+        </div>
+    </article>
+    <hr>
+    <article class="edit-password-wp">
+        <p>Delete account</p>
+        <div class="current-password-wp">
+            <label><input class="current-password password" type="password" placeholder="Enter your current password" require></label>
+        </div>
+        <div class="current-password-wp">
+            <label><input class="current-password confirm-pass" type="password" placeholder="Enter your current password again" require></label>
+        </div>
+        <div class="delete-submit-wp">
+            <button class="submit red" onclick="deleteAccount()">Delete account</button>
         </div>
     </article>
 </div>

@@ -1,6 +1,5 @@
 <?php
     // Dependencies
-    require_once 'config/Database.php';
     require_once 'model/UserModel.php';
 
     //  _   _ ____  _____ ____     ____ ___  _   _ _____ ____   ___  _     _     _____ ____  
@@ -22,8 +21,8 @@
         private $registration_date;
         private $avatar;
 
-        public function __construct() {
-            $this->db = (new Database())->getConnection();
+        public function __construct($db) {
+            $this->db = $db;
             $this->model = new UserModel($this->db);
 
             if(isset($_SESSION['username'])) {
@@ -78,6 +77,10 @@
         
         public function login($username, $password) {
             $loginData = [];
+
+            if($username === 'DeletedAcc') {
+                return DataController::generateData(1, "incorrectpass", "index.php?view=login&error=incorrectpass");
+            }
 
             // Incorrect login
             if(!$this->model->login($username, $password)) {
@@ -171,6 +174,34 @@
             return true;
         }
 
+        public function delete_account($password) {
+            // Comprobar si está conectado
+            if (!$this->get_is_connected()) {
+                return DataController::generateData(1, "user_not_connected", ""); 
+            }
+
+            // Comprobar que los campos no están vacios
+            if (empty($password)) {
+                return DataController::generateData(1, "empty_data", "");
+            }
+
+            // Comprobar que la pass es correcta 
+            if (!$this->model->login($this->get_user_name(), $password)) {
+                return DataController::generateData(1, "incorrectpass", "");
+            }
+
+              // Manda la orden al modelo para que se elimine la cuenta
+              $response = $this->model->delete_account($this->get_user_name());
+
+              // Si la respuesta es negativa
+              if (!$response) {
+                  return DataController::generateData(1, "delete_failed", "");
+              }
+  
+              // Si la respuesta es satisfactoria
+              return DataController::generateData(0, "ok", "index.php?action=logout");
+        }
+
         //      ____      _     ____        _        
         //     / ___| ___| |_  |  _ \  __ _| |_ __ _ 
         //    | |  _ / _ \ __| | | | |/ _` | __/ _` |
@@ -188,6 +219,10 @@
 
         public function get_user_id() {
             return $this->user_id;
+        }
+
+        public function get_user_name() {
+            return $this->username;
         }
 
         public function get_avatar() {

@@ -347,6 +347,7 @@
         <span><b>Pages:</b> </span>
         <?php
         $numberOfPages = ceil($data['posts_count'][0] / 5);
+        if ((int)$numberOfPages === 0) { $numberOfPages = 1; }
         for ($i = 1; $i <= $numberOfPages; $i++) {
         ?>
         <a style="margin-right: 2px;" href="index.php?view=posts&section=<?=$data['section']['id']?>&thread=<?=$data['thread']['id']?>&page=<?=$i?>"><?=$i?></a>

@@ -264,7 +264,7 @@ textarea {
     border: 1px solid var(--main-light-orange);
 }
 
-.create-post  h2, .create-thread h2, .create-section h2 {
+.create-post  h2, .create-thread h2, .create-section h2, #install-form h2 {
     color: #31bd9c;
 }
 
@@ -301,7 +301,7 @@ input[type=submit], .register-link {
     cursor: pointer; 
 }
     
-.pass-submit-wp {
+.pass-submit-wp, .delete-submit-wp {
     margin-top: 20px;
     margin-top: 20px;
     display: flex;
@@ -314,6 +314,7 @@ input[type=submit], .register-link {
     border: 1px solid var(--main-light-orange);
     background-color: var(--main-orange);
 }
+
 /* Register form button class */
 .register-submit  {
     border: 1px solid var(--main-light-orange);
@@ -553,6 +554,39 @@ input[type=submit], .register-link {
     color: var(--main-grey);
 }
 
+.section-wp a {
+    width: 33%;
+}
+
+
+.estitle_input, .esdesc_input {
+    font-size: 1em;
+    padding: 5px;
+    font-size: 17px;
+    border-radius: 10px;
+    border: 1px solid var(--main-light-orange);
+}
+
+.estitle_input {
+    width: 100%;
+}
+
+.esdesc_input {
+    margin: 0 5px;
+    width: 50%;
+}
+
+.edit_section_button {
+    padding: 6px 30px;
+    border: 1px solid var(--main-light-orange);
+    border-radius: 20px;
+    font-size: 1rem;
+    color: var(--main-white);
+    background-color: var(--main-orange);
+    cursor: pointer;
+}
+
+
 
 
 /*
@@ -590,6 +624,7 @@ input[type=submit], .register-link {
 
 .reference-wp {
     display: flex;
+    width: 100%;
 }
 
 .reference-wp h3 {
@@ -761,8 +796,11 @@ input[type=submit], .register-link {
 
 .thread-title-wp input {
     width: 57%;
-    font-size: 1rem;
+    font-size: 1em;
     padding: 5px;
+    font-size: 17px;
+    border-radius: 10px;
+    border: 1px solid var(--main-light-orange);
 }
 
 #create-post-wp {
@@ -937,6 +975,11 @@ input[type=submit], .register-link {
     margin-top: 10px;
 }
 
+.red {
+    background-color: #cb1129;
+    border: 1px solid #cb1129;
+}
+
 
 .my-posts-a-wp {
     display: flex;
@@ -953,6 +996,33 @@ input[type=submit], .register-link {
 }
 
 
+.install-form-wp {
+    flex-direction: row;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+fieldset {
+    border: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+}
+
+.db-settings label:last-child {
+    margin-bottom: 0px;
+}
+
+#install-form h2 {
+    margin-bottom: 20px;
+}
+ .last-inpt {
+    margin-bottom: 0;
+ }
 
 
 

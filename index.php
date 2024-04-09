@@ -19,13 +19,99 @@
     //            |_|                                                 
     session_start();
     const INIT = "1314";
+    require_once 'lib/ForumUtils.php';
+    require_once 'controller/DataController.php';
+    
+    if (!ForumUtils::isForumInstalled()) {
+
+        if(isset($_GET['action']) && $_GET['action'] === 'install') {
+            $jsonData = DataController::decodeJson();
+            // var_dump($jsonData);
+
+            // Comprobar que los campos no están vacíos
+            if(empty($jsonData->dbhost) || empty($jsonData->dbname) || empty($jsonData->dbuser) || empty($jsonData->dbpass) || empty($jsonData->username) || empty($jsonData->password)){
+                DataController::returnJson(DataController::generateData(1, 'empty_data', ''));
+                exit();
+            }
+
+            // Conectarse a la base de datos
+            try {
+                $conn = new PDO("mysql:host=" . $jsonData->dbhost . ";dbname=" . $jsonData->dbname, $jsonData->dbuser, $jsonData->dbpass);
+            }
+            catch(PDOException $exception) {
+                DataController::returnJson(DataController::generateData(1, 'mysql_connection_failed', '', [$exception->getMessage()]));
+                exit();
+            }
+
+            // Create tables
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $queryArray = [
+                "DROP TABLE IF EXISTS `posts`",
+                "DROP TABLE IF EXISTS `sections`",
+                "DROP TABLE IF EXISTS `threads`",
+                "DROP TABLE IF EXISTS `users`",
+                "SET NAMES utf8mb4",
+                "SET FOREIGN_KEY_CHECKS = 0",
+                "CREATE TABLE `users` (`id` int(11) NOT NULL AUTO_INCREMENT, `username` varchar(128) NOT NULL, `email` varchar(255) NOT NULL, `password` varchar(255) NOT NULL, `privileges` varchar(50) NOT NULL, `registration_date` datetime NOT NULL, `avatar` varchar(255) NOT NULL DEFAULT '', PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+                "CREATE TABLE `sections` (`id` int(11) NOT NULL AUTO_INCREMENT, `title` varchar(255) NOT NULL, `description` text NOT NULL, `creation_date` datetime NOT NULL DEFAULT current_timestamp(), `user_id` int(11) NOT NULL, PRIMARY KEY (`id`), KEY `created_by` (`user_id`), CONSTRAINT `sections_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+                "CREATE TABLE `threads` (`id` int(11) NOT NULL AUTO_INCREMENT, `title` varchar(255) NOT NULL, `section_id` int(11) NOT NULL, `user_id` int(11) NOT NULL, `msg` text NOT NULL, `creation_date` datetime NOT NULL DEFAULT current_timestamp(), PRIMARY KEY (`id`), KEY `section_id` (`section_id`), KEY `created_by` (`user_id`), CONSTRAINT `threads_ibfk_1` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`), CONSTRAINT `threads_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+                "CREATE TABLE `posts` (`id` int(11) NOT NULL AUTO_INCREMENT, `section_id` int(11) NOT NULL, `thread_id` int(11) NOT NULL, `user_id` int(11) NOT NULL, `msg` text NOT NULL, `creation_date` datetime NOT NULL DEFAULT current_timestamp(), PRIMARY KEY (`id`), KEY `section_id` (`section_id`), KEY `thread_id` (`thread_id`), KEY `created_by` (`user_id`), CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`), CONSTRAINT `posts_ibfk_2` FOREIGN KEY (`thread_id`) REFERENCES `threads` (`id`), CONSTRAINT `posts_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+                "SET FOREIGN_KEY_CHECKS = 1"
+            ];
+
+            try {
+                foreach($queryArray as $query) {
+                    $stmt = $conn->prepare($query);
+                    $stmt->execute();
+                }
+            }
+            catch(PDOException $exception) {
+                DataController::returnJson(DataController::generateData(1, 'installation_error', '', [$exception->getMessage()]));
+                exit();
+            }
+
+            // Crear usuario con permiso de administrador
+            $registration_date = date('Y-m-d H:i:s');
+            $stmt = $conn->prepare("INSERT INTO users SET username=:username, email=:email, password=:password, privileges='admin', registration_date=:registration_date");
+
+            // Check that the email syntax is correct
+            if (!filter_var($jsonData->email, FILTER_VALIDATE_EMAIL)) {
+                return "not_valid_broh";
+            }
+            
+            $password = password_hash($jsonData->password, PASSWORD_DEFAULT);
+            $stmt->bindParam(":username", $jsonData->username);
+            $stmt->bindParam(":email", $jsonData->email);
+            $stmt->bindParam(":password", $password);
+            $stmt->bindParam(":registration_date", $registration_date);
+            $stmt->execute();
+
+            // Crear fichero config.php
+            $config =  "<?php\n";
+            $config .= "\$dbHost = '$jsonData->dbhost';\n";
+            $config .= "\$dbName = '$jsonData->dbname';\n";
+            $config .= "\$dbUser = '$jsonData->dbuser';\n";
+            $config .= "\$dbPass = '$jsonData->dbpass';\n";
+            $config .= "?>\n";
+            file_put_contents('config/config.php', $config);
+
+            DataController::returnJson(DataController::generateData(0, 'ok', 'index.php'));
+            exit();
+        }
+        $view = 'view/install.php';
+        include 'view/template.php';
+        exit();
+    }
+
+    include 'config/config.php';
     require_once 'config/Database.php';
     require_once 'controller/UserController.php';
     require_once 'controller/ForumController.php';
-    require_once 'controller/DataController.php';
-
-    $userController = new UserController();
-    $forumController = new ForumController($userController);
+    
+    $db = (new Database($dbHost, $dbName, $dbUser, $dbPass))->getConnection();
+    $userController = new UserController($db);
+    $forumController = new ForumController($db, $userController);
     $avatarSrc = $userController->get_avatar() === 'default' ? 'images/default-user.jpg' : 'uploads/'.$userController->get_avatar();
 
     //  ____        __             _ _                            
@@ -145,19 +231,57 @@
             DataController::returnJson($userController->edit_password($jsonData->password, $jsonData->currentpass));
         }
 
+        // Upload avatar
         if ($_GET['action'] === "avatar_upload") {
-            $origFilename = basename($_FILES['avatar']['name']);
-            $ext = pathinfo($origFilename, PATHINFO_EXTENSION);
-            $filename = md5($origFilename).".".$ext;
-            if (!move_uploaded_file($_FILES['avatar']['tmp_name'], "./uploads/$filename")) {
-                DataController::returnJson(DataController::generateData(1, "error", ""));
+            try {
+                if (!isset($_FILES['avatar']) || !isset($_FILES['avatar']['name']) || !isset($_FILES['avatar']['tmp_name']) || $_FILES['avatar']['tmp_name'] === "") {
+                    DataController::returnJson(DataController::generateData(1, "max_size_allowed", ""));
+                    exit();
+                }
+                $origFilename = basename($_FILES['avatar']['name']);
+                $ext = pathinfo($origFilename, PATHINFO_EXTENSION);
+    
+                // Comprobar que la extensión es permitida
+                $allowed_file_extensions = array('jpg', 'png', 'gif');
+                if (!in_array($ext, $allowed_file_extensions)) {
+                    DataController::returnJson(DataController::generateData(1, "bad_filetype", ""));
+                    exit();
+                }
+    
+                // Comprobar que el MIME Type es permitido
+                $allowed_mime_types = array('image/jpeg','image/png','image/gif');
+                $finfo = new finfo();
+                $mimeType = $finfo->file($_FILES['avatar']['tmp_name'], FILEINFO_MIME_TYPE);
+                if(!in_array($mimeType, $allowed_mime_types)){
+                    DataController::returnJson(DataController::generateData(1, "bad_filetype", ""));
+                    exit();
+                }
+    
+                // Mover el fichero
+                $filename = md5($origFilename).".".$ext;
+                if (empty($filename)) {
+                    DataController::returnJson(DataController::generateData(1, "max_allowed_size", ""));
+                    exit();
+                }
+                if (!move_uploaded_file($_FILES['avatar']['tmp_name'], "./uploads/$filename")) {
+                    DataController::returnJson(DataController::generateData(1, "error", ""));
+                }
+                $userController->save_avatar($filename);
+                DataController::returnJson(DataController::generateData(0, "ok", "", [
+                    "filename" => $filename
+                ]));
             }
-            $userController->save_avatar($filename);
-            DataController::returnJson(DataController::generateData(0, "ok", "", [
-                "filename" => $filename
-            ]));
-            
+            catch (Exception $e) {
+                DataController::returnJson(DataController::generateData(1, "max_size_allowed", ""));
+                exit();
+            }
+        }
 
+        // Delete account
+        if ($_GET['action'] === "delete_account") {
+            
+            $jsonData = DataController::decodeJson();
+            DataController::returnJson($userController->delete_account($jsonData->password));
         }
         
         exit();
@@ -227,6 +351,8 @@
             $data = $userController->get_my_posts()['data'];
             $view = "view/myposts.php";
         }
+
+
 
         include 'view/template.php';
         exit();
