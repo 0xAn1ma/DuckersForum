@@ -1,8 +1,8 @@
 ## Introducción
 
-El proyecto se ha desarrollado como parte del trabajo final del módulo de PHP/ MySQL para el curso de Experto Universitario en Desarrollo de Aplicaciones Web, con el objetivo de aplicar conocimientos teóricos y prácticos en un contexto real de desarrollo de software.
+RWwgcHJveWVjdG8gc2UgaGEgZGVzYXJyb2xsYWRvIGNvbW8gcGFydGUgZGVsIHRyYWJham8gZmluYWwgZGVsIG3Ds2R1bG8gZGUgUEhQLyBNeVNRTCBwYXJhIGVsIGN1cnNvIGRlIEV4cGVydG8gVW5pdmVyc2l0YXJpbyBlbiBEZXNhcnJvbGxvIGRlIEFwbGljYWNpb25lcyBXZWIsIGNvbiBlbCBvYmpldGl2byBkZSBhcGxpY2FyIGNvbm9jaW1pZW50b3MgdGXDs3JpY29zIHkgcHLDoWN0aWNvcyBlbiB1biBjb250ZXh0byByZWFsIGRlIGRlc2Fycm9sbG8gZGUgc29mdHdhcmUuCg==
 
-[Enlace a la memoria del proyecto](/Applications/Joplin.app/Contents/Resources/app.asar/nhoagm.dev/DuckersForum/memoria.docx)
+🤌🏼
 
 ## Requisitos del sistema
 
